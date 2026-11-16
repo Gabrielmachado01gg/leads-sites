@@ -8,33 +8,96 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Leads">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:,">
 <title>Leads de Sites</title>
 <style>
 :root{
   --bg:#0f172a;--panel:#111c33;--panel2:#16233f;--line:#22304f;--text:#e8eefc;--muted:#8fa0c4;
-  --brand:#4f8cff;--ok:#2fbf71;--warn:#f5a524;--bad:#ef5b5b;--r:14px;
+  --brand:#4f8cff;--ok:#2fbf71;--warn:#f5a524;--bad:#ef5b5b;--violet:#a78bfa;--r:14px;
 }
 *{box-sizing:border-box;margin:0}
 html{-webkit-text-size-adjust:100%}
 body{font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);
-  padding:env(safe-area-inset-top) env(safe-area-inset-right) calc(80px + env(safe-area-inset-bottom)) env(safe-area-inset-left)}
-header{display:flex;align-items:center;gap:12px;padding:16px;position:sticky;top:0;background:rgba(15,23,42,.92);backdrop-filter:blur(8px);z-index:20;border-bottom:1px solid var(--line)}
-header{flex-wrap:wrap;gap:8px 8px}
-header h1{font-size:18px;font-weight:700;flex:1 1 100%}
-@media(min-width:600px){header h1{flex:1 1 auto}}
-header h1 small{display:block;font-size:12px;font-weight:400;color:var(--muted)}
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) calc(84px + env(safe-area-inset-bottom)) env(safe-area-inset-left)}
 button,select,input,textarea{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+/* ---------- topo e menu ---------- */
+.top{display:flex;align-items:center;gap:16px;padding:12px 16px;position:sticky;top:0;background:rgba(15,23,42,.94);backdrop-filter:blur(8px);z-index:20;border-bottom:1px solid var(--line)}
+.brand{font-size:18px;font-weight:700;flex:1 1 auto;line-height:1.2}
+.brand small{display:block;font-size:12px;font-weight:400;color:var(--muted)}
+.nav{display:none;gap:4px}
+.nav button{display:flex;align-items:center;gap:8px;background:none;border:0;padding:9px 14px;border-radius:10px;cursor:pointer;color:var(--muted);font-weight:600}
+.nav button:hover{color:var(--text);background:var(--panel)}
+.nav button[aria-current=page]{color:#fff;background:var(--panel2);box-shadow:0 0 0 1px var(--line) inset}
+.nav svg,.tabbar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.tabbar{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(17,28,51,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:40;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 2px 8px;font-size:11px;color:var(--muted);cursor:pointer}
+.tabbar button[aria-current=page]{color:var(--brand)}
+@media(min-width:860px){.nav{display:flex}.tabbar{display:none}body{padding-bottom:40px}}
+
+/* ---------- base ---------- */
 .btn{background:var(--panel2);border:1px solid var(--line);padding:9px 14px;border-radius:10px;cursor:pointer;min-height:40px;
   color:var(--text);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;text-align:center}
 .btn:hover{border-color:var(--brand)}
 .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
-.btn.wa{background:#1fa855;border-color:#1fa855;color:#fff;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn.wa{background:#1fa855;border-color:#1fa855;color:#fff;font-weight:600}
 .btn.sm{padding:6px 10px;min-height:34px;font-size:13px}
 main{max-width:1200px;margin:0 auto;padding:16px}
+.view[hidden]{display:none}
+h2.vt{font-size:20px;margin:2px 0 4px}
+.lead{color:var(--muted);margin-bottom:14px;max-width:70ch}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.panel h3{font-size:15px;margin-bottom:2px}
+.panel .sub{color:var(--muted);font-size:13px;margin-bottom:12px}
+.grid2{display:grid;gap:12px}
+@media(min-width:900px){.grid2{grid-template-columns:1fr 1fr}}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.tag{background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:2px 9px;font-size:12px}
+.tag.nosite{border-color:var(--ok);color:var(--ok)}.tag.insta{border-color:var(--warn);color:var(--warn)}.tag.hassite{border-color:var(--bad);color:var(--bad)}
+.tag.money{border-color:var(--ok);color:var(--ok);font-weight:600}
+.empty{text-align:center;color:var(--muted);padding:40px 16px;border:1px dashed var(--line);border-radius:var(--r)}
+.empty b{color:var(--text);display:block;font-size:17px;margin-bottom:6px}
+
+/* ---------- painel ---------- */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+@media(min-width:760px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.stat span{font-size:12px;color:var(--muted);display:block}
+.stat b{font-size:24px;display:block;margin-top:2px}
+.stat small{font-size:12px;color:var(--muted)}
+.meta-bar{height:8px;background:var(--panel2);border-radius:99px;overflow:hidden;margin-top:8px}
+.meta-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--ok));border-radius:99px}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-size:19px}
+.chart .v{fill:var(--text);font-weight:600}
+.funnel{display:grid;gap:8px}
+.fr{display:grid;grid-template-columns:104px 1fr;gap:10px;align-items:center}
+.fr label{font-size:13px;color:var(--muted)}
+.fb{height:36px;background:var(--panel2);border-radius:9px;position:relative;overflow:hidden}
+.fb i{position:absolute;inset:0 auto 0 0;border-radius:9px;min-width:2px}
+.fb span{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;height:100%;padding:0 10px;font-size:13px;font-weight:600}
+.fb em{font-style:normal;font-weight:400;color:#dbe6ff;font-size:12px}
+.groups{display:grid;gap:12px}
+.grp h4{font-size:13px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.grp h4 i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:5px 11px;font-size:13px;cursor:pointer}
+.chip:hover{border-color:var(--brand)}
+.none{color:var(--muted);font-size:13px}
+.note{border-left:3px solid var(--warn);background:var(--panel2);padding:10px 12px;border-radius:8px;font-size:13px;color:#cfd9f2}
+.note b{color:var(--text)}
+.sales-list{display:grid;gap:6px;margin-top:10px}
+.sale{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:8px 0;border-bottom:1px solid var(--line)}
+.sale small{color:var(--muted);display:block}
+
+/* ---------- leads ---------- */
 .kpis{display:flex;gap:10px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .kpis::-webkit-scrollbar{display:none}
-.kpi{flex:0 0 118px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;cursor:pointer}
-@media(min-width:700px){.kpis{display:grid;grid-template-columns:repeat(5,1fr);overflow:visible}.kpi{flex:none}}
+.kpi{flex:0 0 112px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;cursor:pointer}
+@media(min-width:760px){.kpis{display:grid;grid-template-columns:repeat(6,1fr);overflow:visible}.kpi{flex:none}}
 .kpi.active{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand) inset}
 .kpi b{display:block;font-size:24px}
 .kpi span{font-size:12px;color:var(--muted)}
@@ -43,52 +106,130 @@ main{max-width:1200px;margin:0 auto;padding:16px}
 @media(min-width:800px){.bar{grid-template-columns:2fr 1fr 1fr 1fr 1fr}.bar #q,.bar #fSite{grid-column:auto}}
 .bar input,.bar select{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:42px}
 .count{color:var(--muted);font-size:13px;margin:4px 2px 10px}
-/* cards (mobile) and table (desktop) */
 .list{display:grid;gap:10px}
 @media(min-width:900px){.list{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:1150px){.list{grid-template-columns:repeat(3,1fr)}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
 .card h3{font-size:16px;line-height:1.25}
-.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--muted)}
-.tag{background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:2px 9px;font-size:12px}
-.tag.nosite{border-color:var(--ok);color:var(--ok)}
-.tag.insta{border-color:var(--warn);color:var(--warn)}
-.tag.hassite{border-color:var(--bad);color:var(--bad)}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--muted);margin-top:4px}
 .addr{color:var(--muted);font-size:13px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 .row>*{flex:1;min-width:110px}
 .card select,.card textarea{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
 .card textarea{min-height:56px;resize:vertical;font-size:14px}
-.st-novo{border-left:4px solid var(--muted)}.st-contatado{border-left:4px solid var(--warn)}
-.st-respondeu{border-left:4px solid var(--brand)}.st-proposta{border-left:4px solid #a78bfa}
+.next{display:flex;gap:6px;flex-wrap:wrap}
+.next .btn{flex:1;min-width:0;border-color:var(--brand);color:#cfe0ff}
+.st-novo{border-left:4px solid var(--muted)}.st-contatado{border-left:4px solid var(--warn)}.st-visualizou{border-left:4px solid #38bdf8}
+.st-respondeu{border-left:4px solid var(--brand)}.st-proposta{border-left:4px solid var(--violet)}
 .st-fechado{border-left:4px solid var(--ok)}.st-perdido{border-left:4px solid var(--bad);opacity:.7}
-.empty{text-align:center;color:var(--muted);padding:48px 16px;border:1px dashed var(--line);border-radius:var(--r)}
-.empty b{color:var(--text);display:block;font-size:17px;margin-bottom:6px}
-/* dialogs */
+
+/* ---------- mensagens ---------- */
+.pick{display:grid;gap:6px;margin-bottom:14px;max-width:520px}
+.pick label,.fld label{font-size:12px;color:var(--muted)}
+.pick select,.fld input,.fld select{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:42px}
+.mg{margin-bottom:22px}
+.mg>h3{font-size:15px;margin:0 0 8px}
+.mgrid{display:grid;gap:12px}
+@media(min-width:900px){.mgrid{grid-template-columns:1fr 1fr}}
+.msg{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg h4{font-size:14px}.msg .when{font-size:12px;color:var(--muted)}
+.wa-bg{background:#0b141a;border-radius:12px;padding:12px;background-image:radial-gradient(#ffffff08 1px,transparent 1px);background-size:14px 14px}
+.bubble{background:#005c4b;color:#e9edef;border-radius:10px 10px 10px 2px;padding:9px 12px;max-width:94%;white-space:pre-wrap;word-wrap:break-word;font-size:14.5px;line-height:1.4;box-shadow:0 1px 1px #0006}
+.bubble mark{background:#f5a52440;color:#ffe3a8;border-radius:3px;padding:0 2px}
+.msg textarea{width:100%;min-height:150px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px;font-size:14px}
+
+/* ---------- contrato ---------- */
+.cwrap{display:grid;gap:14px}
+@media(min-width:1000px){.cwrap{grid-template-columns:340px 1fr;align-items:start}.cform{position:sticky;top:76px;max-height:calc(100vh - 96px);overflow:auto}}
+.cform .fld{margin-bottom:10px}
+.cform h3{margin-bottom:10px}
+.cform details{margin:6px 0 10px}
+.cform summary{cursor:pointer;color:var(--muted);font-size:13px;margin-bottom:8px}
+.cdoc{background:#fff;color:#111;border-radius:var(--r);padding:22px 20px;line-height:1.55;font-family:Georgia,"Times New Roman",serif;font-size:15px}
+.cdoc h1{font-size:19px;text-align:center;margin:0 0 16px}
+.clause{margin-bottom:16px}
+.clause .ch{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+.clause h3{font-size:16px;font-family:system-ui,sans-serif}
+.clause .cp{font:12px system-ui,sans-serif;background:#eef2ff;border:1px solid #c7d2fe;color:#3730a3;border-radius:8px;padding:4px 10px;cursor:pointer}
+.clause p{margin:0 0 6px}.clause ul{margin:0 0 6px 20px}
+.cdoc mark{background:#fde68a;color:#111;border-radius:3px;padding:0 2px}
+.sig{display:grid;gap:22px;margin-top:26px}
+@media(min-width:700px){.sig{grid-template-columns:1fr 1fr}}
+.sig div{border-top:1px solid #111;padding-top:6px;font-size:13px}
+
+/* ---------- passo a passo ---------- */
+.steps{display:grid;gap:14px}
+.sg h3{font-size:15px;margin-bottom:8px}
+.step{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.step:first-of-type{border-top:0}
+.step input{width:22px;height:22px;accent-color:var(--ok);margin-top:2px}
+.step b{display:block}
+.step.done b{text-decoration:line-through;color:var(--muted)}
+.step p{color:var(--muted);font-size:13.5px;margin-top:2px}
+.step .go{margin-top:6px}
+.prog{height:8px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:6px 0 14px}
+.prog i{display:block;height:100%;background:var(--ok)}
+
+/* ---------- dialogs, fab, toast ---------- */
 dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:18px;padding:18px;width:min(560px,94vw);max-height:92vh;overflow:auto}
 dialog::backdrop{background:rgba(0,0,0,.6)}
 dialog h2{font-size:17px;margin-bottom:10px}
 dialog label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
 dialog input,dialog textarea,dialog select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
+dialog input[type=checkbox]{width:auto}
 dialog textarea{min-height:110px}
-.hint{font-size:12px;color:var(--muted);margin-top:6px}
 .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
-.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;font-size:28px;line-height:1;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:30;border:0;background:var(--brand);color:#fff;cursor:pointer}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#000c;border:1px solid var(--line);padding:10px 16px;border-radius:99px;font-size:14px;z-index:50;opacity:0;pointer-events:none;transition:.25s}
+.fab{position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;font-size:28px;line-height:1;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:30;border:0;background:var(--brand);color:#fff;cursor:pointer}
+@media(min-width:860px){.fab{bottom:24px}}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#000c;border:1px solid var(--line);padding:10px 16px;border-radius:99px;font-size:14px;z-index:50;opacity:0;pointer-events:none;transition:.25s;max-width:90vw;text-align:center}
 .toast.show{opacity:1}
+
+@media print{
+  body{background:#fff;padding:0}
+  .top,.tabbar,.fab,.toast,.view:not(#v-contrato),.cform,.ctools,.clause .cp,#v-contrato .vt,#v-contrato .lead{display:none!important}
+  main{padding:0}.cwrap{display:block}.cdoc{border-radius:0;padding:0;font-size:12.5px}
+}
 </style>
 </head>
 <body>
-<header>
-  <h1>Leads de Sites<small id="sub"></small></h1>
-  <button class="btn sm" id="bImport">Importar</button>
-  <button class="btn sm" id="bExport">Exportar</button>
-  <button class="btn sm" id="bMsg">Mensagem</button>
+<header class="top">
+  <div class="brand">Leads de Sites<small id="sub"></small></div>
+  <nav class="nav" id="nav" aria-label="Menu principal"></nav>
 </header>
+<nav class="tabbar" id="tabbar" aria-label="Menu principal"></nav>
 
 <main>
-  <section class="kpis" id="kpis"></section>
+<!-- ================= PAINEL ================= -->
+<section class="view" id="v-painel" hidden>
+  <h2 class="vt">Painel</h2>
+  <p class="lead" id="pLead"></p>
+  <div class="stats" id="stats"></div>
+  <div class="grid2">
+    <div class="panel chart"><h3>Vendas por mês</h3><div class="sub">Valor dos sites fechados nos últimos 6 meses</div><div id="chart"></div></div>
+    <div class="panel"><h3>Funil de vendas</h3><div class="sub">Quantas lojas chegaram em cada etapa</div><div class="funnel" id="funnel"></div></div>
+  </div>
+  <div class="grid2" style="margin-top:12px">
+    <div class="panel"><h3>Quem está em cada etapa</h3><div class="sub">Toque em um nome para abrir a loja</div><div class="groups" id="groups"></div></div>
+    <div style="display:grid;gap:12px;align-content:start">
+      <div class="panel"><h3>Vendas do mês</h3><div class="sales-list" id="salesList"></div></div>
+      <div class="panel"><h3>O que é automático e o que é manual</h3>
+        <div class="note" id="autoNote"></div>
+      </div>
+      <div class="panel"><h3>Seus dados</h3><div class="sub">Tudo fica salvo neste aparelho. Para levar para outro, faça um backup.</div>
+        <div class="toolbar"><button class="btn sm" id="bBackup">Baixar backup</button><button class="btn sm" id="bRestore">Restaurar backup</button><input type="file" id="fRestore" accept="application/json,.json" hidden></div>
+      </div>
+    </div>
+  </div>
+</section>
 
+<!-- ================= LEADS ================= -->
+<section class="view" id="v-leads" hidden>
+  <div class="toolbar">
+    <button class="btn sm" id="bImport">Importar CSV</button>
+    <button class="btn sm" id="bExport">Exportar CSV</button>
+    <button class="btn sm" id="bMsg">Modelo do botão WhatsApp</button>
+  </div>
+  <section class="kpis" id="kpis"></section>
   <section class="bar">
     <input id="q" type="search" placeholder="Buscar por nome, bairro, telefone…">
     <select id="fSite">
@@ -109,12 +250,72 @@ dialog textarea{min-height:110px}
       <option value="recent">Adicionados recentemente</option>
     </select>
   </section>
-
   <div class="count" id="count"></div>
   <section class="list" id="list"></section>
+</section>
+
+<!-- ================= MENSAGENS ================= -->
+<section class="view" id="v-msgs" hidden>
+  <h2 class="vt">Mensagens</h2>
+  <p class="lead">Textos prontos para cada momento da venda. Escolha uma loja para ver como a mensagem fica já com o nome dela, copie e cole no WhatsApp.</p>
+  <div class="pick fld"><label for="mLead">Pré-visualizar com a loja</label><select id="mLead"></select></div>
+  <div id="msgs"></div>
+</section>
+
+<!-- ================= CONTRATO ================= -->
+<section class="view" id="v-contrato" hidden>
+  <h2 class="vt">Contrato</h2>
+  <p class="lead">Preencha os dados do cliente e o contrato se monta sozinho. Copie tudo, uma cláusula só, ou salve em PDF para assinar pelo gov.br. Os trechos em amarelo ainda estão em branco.</p>
+  <div class="cwrap">
+    <div class="panel cform">
+      <h3>Dados do cliente</h3>
+      <div class="fld"><label for="cLead">Preencher com uma loja da lista</label><select id="cLead"></select></div>
+      <div class="fld"><label>Nome ou razão social</label><input data-c="cliente"></div>
+      <div class="fld"><label>CPF ou CNPJ</label><input data-c="doc" inputmode="numeric"></div>
+      <div class="fld"><label>Endereço</label><input data-c="endCli"></div>
+      <div class="fld"><label>Responsável (quem assina)</label><input data-c="repr"></div>
+      <div class="fld"><label>E-mail</label><input data-c="emailCli" type="email"></div>
+      <div class="fld"><label>WhatsApp</label><input data-c="zapCli" inputmode="tel"></div>
+      <h3 style="margin-top:14px">Combinado</h3>
+      <div class="fld"><label>Valor total (R$)</label><input data-c="valor" inputmode="decimal" placeholder="800 a 2200"></div>
+      <div class="fld"><label>Prazo de entrega (dias úteis)</label><input data-c="prazo" inputmode="numeric"></div>
+      <div class="fld"><label>Páginas ou seções</label><input data-c="escopo" placeholder="página única: início, serviços, avaliações, contato"></div>
+      <div class="fld"><label>Data de pagamento da entrada</label><input data-c="dEntrada" placeholder="ex.: 20/11/2026"></div>
+      <div class="fld"><label>Data de pagamento final</label><input data-c="dEntrega" placeholder="ex.: no dia da aprovação"></div>
+      <div class="fld"><label>Manutenção mensal (R$ 99,90)</label>
+        <select data-c="manut"><option value="">Ainda não definido</option><option value="sim">Cliente quer contratar</option><option value="nao">Não quer agora</option></select></div>
+      <div class="fld"><label>Dia do vencimento da manutenção</label><input data-c="diaManut" inputmode="numeric"></div>
+      <details><summary>Meus dados (Contratado)</summary>
+        <div class="fld"><label>Nome</label><input data-m="nome"></div>
+        <div class="fld"><label>CNPJ</label><input data-m="cnpj"></div>
+        <div class="fld"><label>Endereço</label><input data-m="end"></div>
+        <div class="fld"><label>E-mail</label><input data-m="email"></div>
+        <div class="fld"><label>WhatsApp</label><input data-m="zap"></div>
+      </details>
+      <button class="btn sm" id="cClear">Limpar dados do cliente</button>
+    </div>
+    <div>
+      <div class="toolbar ctools">
+        <button class="btn primary" id="cCopy">Copiar contrato inteiro</button>
+        <button class="btn" id="cPrint">Salvar em PDF / imprimir</button>
+        <button class="btn" id="cWa">Copiar texto curto para o WhatsApp</button>
+      </div>
+      <article class="cdoc" id="cdoc"></article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PASSO A PASSO ================= -->
+<section class="view" id="v-passos" hidden>
+  <h2 class="vt">Passo a passo</h2>
+  <p class="lead">Do primeiro contato ao site no ar. Marque o que já fez. Ao começar um cliente novo, toque em “Reiniciar”.</p>
+  <div class="prog"><i id="progBar" style="width:0"></i></div>
+  <div class="toolbar"><span class="count" id="progTxt" style="margin:0;align-self:center"></span><button class="btn sm" id="stepsReset" style="margin-left:auto">Reiniciar para novo cliente</button></div>
+  <div class="steps" id="steps"></div>
+</section>
 </main>
 
-<button class="fab" id="bAdd" aria-label="Adicionar loja">+</button>
+<button class="fab" id="bAdd" aria-label="Adicionar loja" hidden>+</button>
 <div class="toast" id="toast"></div>
 
 <!-- Importar -->
@@ -162,39 +363,126 @@ dialog textarea{min-height:110px}
   </form>
 </dialog>
 
-<!-- Mensagem -->
+<!-- Modelo do botão WhatsApp -->
 <dialog id="dMsg">
-  <h2>Mensagem do WhatsApp</h2>
+  <h2>Mensagem do botão WhatsApp</h2>
   <label>Modelo (use {nome} e {nicho})</label>
   <textarea id="msgText"></textarea>
-  <p class="hint">Vale personalizar: cite algo real da loja (nota alta, bairro). Fale do ganho dela, e não de tecnologia. Ofereça mostrar um exemplo pronto.</p>
+  <p class="hint">É a mensagem que abre ao tocar em “WhatsApp” em cada loja. Na aba Mensagens você escolhe um modelo pronto com um toque.</p>
   <div class="actions">
     <button class="btn" data-close>Fechar</button>
     <button class="btn primary" id="saveMsg">Salvar modelo</button>
   </div>
 </dialog>
 
+<!-- Venda fechada -->
+<dialog id="dSale">
+  <h2 id="saleTitle">Venda fechada</h2>
+  <form id="fSale" method="dialog">
+    <label>Valor do site (R$)</label><input name="valor" inputmode="decimal" placeholder="ex.: 1200" required>
+    <label>Data do fechamento</label><input name="data" type="date">
+    <label style="display:flex;gap:8px;align-items:center;margin-top:14px"><input type="checkbox" name="manut" style="width:auto"> Cliente contratou a manutenção mensal (R$ 99,90)</label>
+    <div class="actions">
+      <button type="button" class="btn" data-close>Agora não</button>
+      <button class="btn primary" value="ok">Salvar venda</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
 (() => {
+  // ---------- dados base ----------
   const STATUSES = [
-    ['novo','Novo'],['contatado','Contatado'],['respondeu','Respondeu'],
+    ['novo','Novo'],['contatado','Contatado'],['visualizou','Visualizou'],['respondeu','Respondeu'],
     ['proposta','Proposta enviada'],['fechado','Fechado ✅'],['perdido','Sem interesse']
   ];
+  const RANK = {novo:0,contatado:1,visualizou:2,respondeu:3,proposta:4,fechado:5};
+  const NEXT = {
+    contatado:[['visualizou','👀 Viu'],['respondeu','💬 Respondeu']],
+    visualizou:[['respondeu','💬 Respondeu']],
+    respondeu:[['proposta','📄 Enviei proposta']],
+    proposta:[['fechado','🎉 Fechou'],['perdido','Recusou']]
+  };
+  const MAN_PRICE = 99.9;
   const DEFAULT_MSG = "Oi, tudo bem? Vi a {nome} no Google e reparei que vocês têm ótimas avaliações, mas ainda não têm um site. Montei um exemplo de como poderia ficar para {nicho} e queria te mostrar, sem compromisso. Posso enviar por aqui?";
-  const KEY = 'leadsSites.v1', MSGKEY = 'leadsSites.msg';
+  const K = { leads:'leadsSites.v1', msg:'leadsSites.msg', dis:'leadsSites.dismissed', tpl:'leadsSites.tpls',
+              contract:'leadsSites.contract', me:'leadsSites.me', steps:'leadsSites.steps', meta:'leadsSites.meta' };
   const $ = s => document.querySelector(s);
-  let leads = load();
+  const $$ = s => [...document.querySelectorAll(s)];
+  const jget = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
+  const jset = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { toast('Não consegui salvar neste navegador'); } };
+  let leads = jget(K.leads, []);
   let kpiFilter = '';
 
-  function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
-  function save(){ try { localStorage.setItem(KEY, JSON.stringify(leads)); } catch { toast('Não consegui salvar neste navegador'); } }
-  function msgTpl(){ try { return localStorage.getItem(MSGKEY) || DEFAULT_MSG; } catch { return DEFAULT_MSG; } }
+  function save(){ jset(K.leads, leads); }
+  function msgTpl(){ try { return localStorage.getItem(K.msg) || DEFAULT_MSG; } catch { return DEFAULT_MSG; } }
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const brl = n => (Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:(Number(n)||0)%1?2:0});
+  const num = s => { const n = parseFloat(String(s).replace(/\./g,'').replace(',','.')); return isFinite(n) ? n : 0; };
+  const mkey = ts => { const d = new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); };
 
   function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('show'),2200); }
+  async function copyText(t, okMsg){
+    try { await navigator.clipboard.writeText(t); }
+    catch { const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch{} ta.remove(); }
+    toast(okMsg || 'Copiado');
+  }
 
+  // ---------- menu ----------
+  const ICONS = {
+    painel:'<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>',
+    leads:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M17 4.5a3.5 3.5 0 010 7M18.5 14.8c2 .6 3.4 2.3 3.8 5"/>',
+    msgs:'<path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-5.6A8 8 0 1121 12z"/>',
+    contrato:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>',
+    passos:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1 1 2-2M3.5 12l1 1 2-2M3.5 18l1 1 2-2"/>'
+  };
+  const VIEWS = [['painel','Painel','Painel'],['leads','Leads','Leads'],['msgs','Mensagens','Msgs'],['contrato','Contrato','Contrato'],['passos','Passo a passo','Passos']];
+  const navHtml = sh => VIEWS.map(([k,n,s]) => `<button data-v="${k}" aria-label="${n}"><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg><span>${sh?s:n}</span></button>`).join('');
+  $('#nav').innerHTML = navHtml(false); $('#tabbar').innerHTML = navHtml(true);
+  let current = 'painel';
+  function show(v, push = true){
+    if(!VIEWS.some(x=>x[0]===v)) v = 'painel';
+    current = v;
+    $$('.view').forEach(s => s.hidden = s.id !== 'v-'+v);
+    $$('#nav [data-v], #tabbar [data-v]').forEach(b => b.getAttribute('data-v')===v ? b.setAttribute('aria-current','page') : b.removeAttribute('aria-current'));
+    $('#bAdd').hidden = v !== 'leads';
+    if(push && location.hash !== '#'+v) history.replaceState(null,'','#'+v);
+    window.scrollTo(0,0);
+    renderView(v);
+  }
+  document.addEventListener('click', e => { const b = e.target.closest('[data-v]'); if(b) show(b.dataset.v); });
+  window.addEventListener('hashchange', () => show(location.hash.slice(1), false));
+
+  // ---------- etapas e vendas ----------
+  function setStatus(l, s){
+    const prev = l.status || 'novo'; if(prev === s) return;
+    l.status = s; (l.hist = l.hist || []).push({ s, t: Date.now() });
+    if(s === 'fechado' && !l.fechadoEm) l.fechadoEm = Date.now();
+  }
+  function maxRank(l){
+    let r = RANK[l.status||'novo'] ?? 0;
+    (l.hist||[]).forEach(h => { if((RANK[h.s]??0) > r) r = RANK[h.s]; });
+    if((l.status||'')==='perdido' && r < 1) r = 1; // quem recusou foi, no mínimo, contatado
+    return r;
+  }
+  let saleLead = null;
+  function askSale(l){
+    saleLead = l; const f = $('#fSale');
+    $('#saleTitle').textContent = 'Venda fechada: ' + l.name;
+    f.elements.valor.value = l.valor || '';
+    f.elements.data.value = new Date(l.fechadoEm || Date.now()).toISOString().slice(0,10);
+    f.elements.manut.checked = !!l.manut;
+    $('#dSale').showModal();
+  }
+  function changeStatus(l, s){
+    setStatus(l, s); save();
+    if(s === 'fechado') askSale(l);
+    renderView(current);
+  }
+
+  // ---------- leads ----------
   function waLink(l){
     let d = String(l.phone||'').replace(/\D/g,'');
     if(!d) return '';
@@ -207,7 +495,6 @@ dialog textarea{min-height:110px}
     if(/^https?:/i.test(v)) return v;
     return 'https://instagram.com/'+v.replace(/^@/,'');
   }
-  // estado do site: nao | insta | sim | desconhecido
   function siteState(l){
     if(l.siteStatus && l.siteStatus!=='desconhecido') return l.siteStatus;
     const w = norm(l.website);
@@ -219,7 +506,6 @@ dialog textarea{min-height:110px}
     const base = (s==='nao'||s==='insta') ? 1000 : s==='desconhecido' ? 300 : 0;
     return base + (Number(l.reviews)||0) * 0.5 + (Number(l.rating)||0) * 20 + (l.phone?30:0);
   }
-
   function filtered(){
     const q = norm($('#q').value), fs = $('#fSite').value, fc = $('#fCity').value, fn = $('#fNiche').value;
     let r = leads.filter(l => {
@@ -231,7 +517,7 @@ dialog textarea{min-height:110px}
       if(fs==='sim' && st!=='sim') return false;
       if(fc && l.city!==fc) return false;
       if(fn && l.niche!==fn) return false;
-      if(kpiFilter && l.status!==kpiFilter) return false;
+      if(kpiFilter && (l.status||'novo')!==kpiFilter) return false;
       if(q && !norm([l.name,l.address,l.city,l.niche,l.phone].join(' ')).includes(q)) return false;
       return true;
     });
@@ -245,23 +531,22 @@ dialog textarea{min-height:110px}
     });
     return r;
   }
-
   function renderKpis(){
     const counts = Object.fromEntries(STATUSES.map(([k])=>[k,0]));
     leads.forEach(l=>{ counts[l.status||'novo']++; });
     const targets = leads.filter(l=>['nao','insta'].includes(siteState(l))).length;
-    const html = [
+    $('#kpis').innerHTML = [
       `<div class="kpi ${kpiFilter===''?'active':''}" data-k=""><b>${leads.length}</b><span>Lojas (${targets} alvos)</span></div>`,
-      ...['contatado','respondeu','proposta','fechado'].map(k=>{
+      ...['contatado','visualizou','respondeu','proposta','fechado'].map(k=>{
         const name = STATUSES.find(s=>s[0]===k)[1];
         return `<div class="kpi ${kpiFilter===k?'active':''}" data-k="${k}"><b>${counts[k]}</b><span>${name}</span></div>`;
       })
     ].join('');
-    $('#kpis').innerHTML = html;
-    const total = leads.length, contacted = total - counts.novo;
-    $('#sub').textContent = total ? `${contacted} contatadas • ${counts.fechado} fechadas` : 'Comece importando lojas';
   }
-
+  function renderSub(){
+    const total = leads.length, contacted = leads.filter(l=>maxRank(l)>=1).length, sold = leads.filter(l=>l.status==='fechado').length;
+    $('#sub').textContent = total ? `${contacted} contatadas • ${sold} fechadas` : 'Comece importando lojas';
+  }
   function renderFilters(){
     const fill = (sel, key, label) => {
       const cur = sel.value;
@@ -272,20 +557,21 @@ dialog textarea{min-height:110px}
     fill($('#fCity'),'city','Todas as cidades');
     fill($('#fNiche'),'niche','Todos os nichos');
   }
-
   function cardHtml(l){
-    const st = siteState(l);
+    const st = siteState(l), cur = l.status||'novo';
     const tag = st==='nao' ? '<span class="tag nosite">Sem site</span>'
       : st==='insta' ? '<span class="tag insta">Sem site próprio</span>'
       : st==='sim' ? '<span class="tag hassite">Tem site</span>'
       : '<span class="tag">Site não verificado</span>';
     const wa = waLink(l), ig = instaLink(l.instagram);
-    return `<article class="card st-${l.status||'novo'}" data-id="${l.id}">
+    const next = (NEXT[cur]||[]).map(([s,t])=>`<button class="btn sm" data-act="go" data-s="${s}">${t}</button>`).join('');
+    return `<article class="card st-${cur}" data-id="${l.id}">
       <div><h3>${esc(l.name)}</h3>
         <div class="meta">${tag}
           ${l.niche?`<span class="tag">${esc(l.niche)}</span>`:''}
           ${l.rating?`<span>⭐ ${esc(l.rating)}</span>`:''}
           ${l.reviews?`<span>(${esc(l.reviews)} avaliações)</span>`:''}
+          ${cur==='fechado'?`<span class="tag money">${l.valor?brl(l.valor):'sem valor'}${l.manut?' + manutenção':''}</span>`:''}
         </div>
       </div>
       ${l.address||l.city?`<div class="addr">${esc([l.address,l.city].filter(Boolean).join(' • '))}</div>`:''}
@@ -295,8 +581,9 @@ dialog textarea{min-height:110px}
         ${ig?`<a class="btn" href="${esc(ig)}" target="_blank" rel="noopener">Instagram</a>`:''}
         <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(l.name+' '+(l.city||''))}">Maps</a>
       </div>
+      ${next?`<div class="next">${next}</div>`:''}
       <div class="row">
-        <select data-f="status" aria-label="Status">${STATUSES.map(([k,n])=>`<option value="${k}" ${k===(l.status||'novo')?'selected':''}>${n}</option>`).join('')}</select>
+        <select data-f="status" aria-label="Etapa">${STATUSES.map(([k,n])=>`<option value="${k}" ${k===cur?'selected':''}>${n}</option>`).join('')}</select>
         <select data-f="siteStatus" aria-label="Tem site?">
           <option value="desconhecido" ${st==='desconhecido'?'selected':''}>Site: não verificado</option>
           <option value="nao" ${st==='nao'?'selected':''}>Site: não tem</option>
@@ -306,18 +593,18 @@ dialog textarea{min-height:110px}
       </div>
       <textarea data-f="notes" placeholder="Anotações (valor combinado, retorno, dono…)">${esc(l.notes||'')}</textarea>
       <div class="row">
+        ${cur==='fechado'?'<button class="btn sm" data-act="sale">Editar venda</button>':''}
         <button class="btn sm" data-act="edit">Editar</button>
         <button class="btn sm" data-act="del">Excluir</button>
       </div>
     </article>`;
   }
-
-  function render(){
+  function renderLeads(){
     renderKpis(); renderFilters();
     const r = filtered();
     $('#count').textContent = leads.length ? `${r.length} de ${leads.length} lojas` : '';
     if(!leads.length){
-      $('#list').innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Nenhuma loja ainda</b>Toque em <strong>Importar</strong> para colar um CSV, ou no <strong>+</strong> para adicionar uma loja manualmente.</div>`;
+      $('#list').innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Nenhuma loja ainda</b>Toque em <strong>Importar CSV</strong> ou no <strong>+</strong> para adicionar uma loja.</div>`;
     } else if(!r.length){
       $('#list').innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Nada com esses filtros</b>Troque o filtro de site para “Todos” para ver tudo.</div>`;
     } else {
@@ -325,27 +612,292 @@ dialog textarea{min-height:110px}
     }
   }
 
-  // ---------- lista automática (leads.json) ----------
-  const DISKEY = 'leadsSites.dismissed';
-  const keyOf = l => norm(l.name)+'|'+String(l.phone||'').replace(/\D/g,'');
-  function dismissed(){ try { return new Set(JSON.parse(localStorage.getItem(DISKEY))||[]); } catch { return new Set(); } }
-  function dismiss(l){ try { const d=dismissed(); d.add(keyOf(l)); localStorage.setItem(DISKEY, JSON.stringify([...d])); } catch {} }
-  async function loadSeed(){
-    try {
-      const r = await fetch('leads.json', {cache:'no-store'}); if(!r.ok) return;
-      const arr = await r.json(); if(!Array.isArray(arr)) return;
-      const have = new Set(leads.map(keyOf)), gone = dismissed(); let added = 0;
-      for(const o of arr){
-        if(!o || !o.name) continue; const k = keyOf(o);
-        if(have.has(k) || gone.has(k)) continue;
-        have.add(k);
-        leads.push({ id:uid(), name:o.name, phone:o.phone||'', address:o.address||'', city:o.city||'', niche:o.niche||'',
-          rating:o.rating||'', reviews:o.reviews||'', website:o.website||'', instagram:o.instagram||'',
-          siteStatus:o.siteStatus||'desconhecido', status:'novo', notes:'', createdAt:Date.now() });
-        added++;
-      }
-      if(added){ save(); render(); toast(added+' lojas novas na lista'); }
-    } catch {}
+  // ---------- painel ----------
+  const isSold = l => (l.status||'novo')==='fechado';
+  function monthSales(key){ return leads.filter(l=>isSold(l) && l.fechadoEm && mkey(l.fechadoEm)===key); }
+  const getMeta = () => { const m = jget(K.meta, null); return m>0 ? m : 2000; };
+  function renderPainel(){
+    const now = new Date(), key = mkey(now);
+    const ms = monthSales(key), total = ms.reduce((a,l)=>a+(Number(l.valor)||0),0);
+    const sold = leads.filter(isSold), mrr = sold.filter(l=>l.manut).length * MAN_PRICE;
+    const meta = getMeta(), pct = Math.min(100, Math.round(total/meta*100));
+    const mes = now.toLocaleDateString('pt-BR',{month:'long'});
+    $('#pLead').textContent = `Resumo de ${mes}. Os números vêm das etapas que você marca em cada loja.`;
+    $('#stats').innerHTML = `
+      <div class="stat"><span>Vendas em ${esc(mes)}</span><b>${brl(total)}</b><small>${ms.length} ${ms.length===1?'site fechado':'sites fechados'}</small></div>
+      <div class="stat"><span>Ticket médio</span><b>${ms.length?brl(total/ms.length):'–'}</b><small>por site no mês</small></div>
+      <div class="stat"><span>Recorrência mensal</span><b>${brl(mrr)}</b><small>${sold.filter(l=>l.manut).length} com manutenção</small></div>
+      <div class="stat" id="metaBox" style="cursor:pointer"><span>Meta do mês (toque para mudar)</span><b>${pct}%</b><small>${brl(total)} de ${brl(meta)}</small><div class="meta-bar"><i style="width:${pct}%"></i></div></div>`;
+    renderChart(meta); renderFunnel(); renderGroups();
+    $('#salesList').innerHTML = ms.length
+      ? ms.sort((a,b)=>b.fechadoEm-a.fechadoEm).map(l=>`<div class="sale"><div>${esc(l.name)}<small>${new Date(l.fechadoEm).toLocaleDateString('pt-BR')}${l.manut?' • com manutenção':''}</small></div><b>${l.valor?brl(l.valor):'sem valor'}</b></div>`).join('')
+      : '<div class="none">Nenhuma venda neste mês ainda.</div>';
+    $('#autoNote').innerHTML = `<b>Automático:</b> ao tocar em “WhatsApp” a loja vira <i>Contatado</i>; ao marcar <i>Fechou</i> a venda entra no gráfico e a recorrência é somada.<br><br><b>Manual (um toque):</b> <i>Viu</i> e <i>Respondeu</i>. O WhatsApp não informa ao painel quando alguém abre a mensagem. No app WhatsApp Business, os dois tiques azuis mostram que a pessoa viu.`;
+  }
+  function renderChart(meta){
+    const now = new Date(), months = [];
+    for(let i=5;i>=0;i--){ const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+      months.push({ key:mkey(d), label:d.toLocaleDateString('pt-BR',{month:'short'}).replace('.',''), total:0 }); }
+    leads.filter(isSold).forEach(l => { if(!l.fechadoEm) return; const m = months.find(x=>x.key===mkey(l.fechadoEm)); if(m) m.total += Number(l.valor)||0; });
+    const W = 600, H = 250, pl = 10, pr = 10, pt = 28, pb = 30;
+    const maxV = Math.max(meta, ...months.map(m=>m.total), 1) * 1.12;
+    const bw = (W-pl-pr)/months.length, y = v => pt + (H-pt-pb) * (1 - v/maxV);
+    const short = v => v>=1000 ? 'R$ '+(v/1000).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mil' : 'R$ '+Math.round(v);
+    let g = '';
+    months.forEach((m,i) => {
+      const x = pl + i*bw + bw*0.18, w = bw*0.64, top = y(m.total), isNow = i===months.length-1;
+      g += `<rect x="${x}" y="${m.total?top:H-pb-2}" width="${w}" height="${m.total?H-pb-top:2}" rx="6" fill="${isNow?'#2fbf71':'#4f8cff'}" opacity="${m.total?1:.35}"/>`;
+      if(m.total) g += `<text class="v" x="${x+w/2}" y="${top-7}" text-anchor="middle">${short(m.total)}</text>`;
+      g += `<text x="${x+w/2}" y="${H-9}" text-anchor="middle">${esc(m.label)}</text>`;
+    });
+    const ym = y(meta);
+    g += `<line x1="${pl}" x2="${W-pr}" y1="${ym}" y2="${ym}" stroke="#f5a524" stroke-dasharray="5 5" stroke-width="1.5"/><text x="${W-pr}" y="${ym-6}" text-anchor="end" style="fill:#f5a524">meta ${short(meta)}</text>`;
+    const empty = months.every(m=>!m.total);
+    $('#chart').innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Vendas por mês, últimos 6 meses">${g}</svg>` + (empty ? '<div class="none" style="margin-top:6px">Sem vendas registradas ainda. Quando marcar “Fechou” em uma loja, a barra do mês aparece aqui.</div>' : '');
+  }
+  function renderFunnel(){
+    const stages = [
+      ['Lojas na lista', leads.length], ['Contatadas', leads.filter(l=>maxRank(l)>=1).length],
+      ['Viram', leads.filter(l=>maxRank(l)>=2).length], ['Responderam', leads.filter(l=>maxRank(l)>=3).length],
+      ['Proposta', leads.filter(l=>maxRank(l)>=4).length], ['Fecharam', leads.filter(l=>maxRank(l)>=5).length]
+    ];
+    const top = Math.max(stages[0][1], 1), colors = ['#5b6b92','#f5a524','#38bdf8','#4f8cff','#a78bfa','#2fbf71'];
+    $('#funnel').innerHTML = stages.map(([n,v],i) => {
+      const w = Math.max(v/top*100, v?4:0), prev = i? stages[i-1][1] : 0;
+      const conv = i && prev ? Math.round(v/prev*100)+'% da etapa anterior' : '';
+      return `<div class="fr"><label>${n}</label><div class="fb"><i style="width:${w}%;background:${colors[i]}"></i><span>${v}<em>${conv}</em></span></div></div>`;
+    }).join('');
+  }
+  function renderGroups(){
+    const defs = [
+      ['fechado','Aceitaram (fechado)','#2fbf71'], ['proposta','Proposta enviada','#a78bfa'], ['respondeu','Responderam','#4f8cff'],
+      ['visualizou','Só visualizaram','#38bdf8'], ['contatado','Contatadas, sem retorno','#f5a524'], ['perdido','Sem interesse','#ef5b5b']
+    ];
+    $('#groups').innerHTML = defs.map(([s,t,c]) => {
+      const arr = leads.filter(l=>(l.status||'novo')===s);
+      return `<div class="grp"><h4><i style="background:${c}"></i>${t} (${arr.length})</h4>` +
+        (arr.length ? `<div class="chips">${arr.map(l=>`<button class="chip" data-open="${l.id}">${esc(l.name)}</button>`).join('')}</div>` : '<div class="none">Ninguém por aqui.</div>') + '</div>';
+    }).join('');
+  }
+
+  // ---------- mensagens ----------
+  const TPL = [
+    { g:'Primeiro contato', items:[
+      { id:'a1', t:'Pergunta curiosa', w:'A mais leve. Começa uma conversa em vez de vender.', x:"Oi, tudo bem? Uma pergunta rápida: quando alguém procura {nicho} na região, como a pessoa chega até a {nome} hoje?\n\nPergunto porque vocês têm ótimas avaliações no Google, mas não achei um site. Faço sites para negócios de Canoas e região e já montei uma prévia para a {nome}, para mostrar como isso pode trazer mais clientes. Posso te mostrar?" },
+      { id:'a2', t:'Cliente que pesquisa', w:'Explica por que o site importa.', x:"Oi, tudo bem? Aqui é o Gabriel, de Canoas. Vi a {nome} no Google, com ótimas avaliações. Que resultado! 👏\n\nMas reparei que vocês não têm site. Hoje, quem procura {nicho} costuma pesquisar e comparar antes de chamar no WhatsApp. Sem site, parte dessas pessoas acaba indo para quem aparece mais completo.\n\nMontei uma prévia de como o site da {nome} poderia ficar, usando as avaliações reais de vocês. Posso te mandar a imagem? Sem compromisso." },
+      { id:'a3', t:'Elogio e prova', w:'Parte do que os clientes dizem.', x:"Oi! Aqui é o Gabriel. Li as avaliações da {nome} e fiquei impressionado com o que os clientes falam do atendimento. Isso é ouro, e hoje só aparece no Google.\n\nUm site próprio colocaria tudo isso na frente de quem ainda não conhece vocês, com os serviços, as avaliações e o botão de agendar no WhatsApp. É o que costuma transformar quem só está pesquisando em cliente.\n\nFiz uma prévia pensando na {nome}. Quer ver? Leva um minuto." }
+    ]},
+    { g:'Prévia e retorno', items:[
+      { id:'p1', t:'Enviando a prévia', w:'Mande junto com a imagem do topo da prévia.', x:"Aqui está a prévia que fiz para a {nome} 👇\n\nÉ um exemplo de como o site poderia ficar, com as informações e as avaliações do Google de vocês. Os textos e as fotos finais a gente ajusta juntos. O que achou?" },
+      { id:'f1', t:'Retorno depois de 2 dias', w:'Se visualizou e não respondeu.', x:"Oi! Passando só para saber se você chegou a ver a prévia do site da {nome}. Se tiver qualquer dúvida sobre como funciona, é só falar." },
+      { id:'f2', t:'Último retorno', w:'Educado, sem pressão. Fecha o ciclo.', x:"Oi, tudo bem? Não quero te incomodar, então deixo a prévia aqui caso faça sentido mais para frente. Se quiser que eu ajuste ou explique como funciona, é só me chamar. Obrigado pela atenção!" }
+    ]},
+    { g:'Proposta e contrato', items:[
+      { id:'r1', t:'Resumo da proposta', w:'Troque [valor] e [X] antes de enviar.', x:"Combinado! Resumo da proposta para a {nome}:\n\n• Site profissional, adaptado para celular e computador\n• Botões de WhatsApp, ligação e mapa\n• Seções com serviços, avaliações e localização\n• 2 rodadas de ajustes\n• Publicação no domínio da {nome}\n\nValor: [valor], sendo 50% para começar e 50% na entrega.\nPrazo: [X] dias úteis depois da entrada e do envio do material.\n\nOpcionalmente, manutenção mensal de R$ 99,90, com até 2 alterações por mês. Posso te mandar o contrato para assinar pelo gov.br?" },
+      { id:'c1', t:'Enviando o contrato', w:'Anexe o PDF gerado na aba Contrato.', x:"Segue o contrato para assinatura (pelo gov.br ou com um “li e aceito” por aqui). Assim os dois ficam protegidos e o combinado fica registrado. Qualquer dúvida em alguma cláusula, me pergunte." },
+      { id:'c2', t:'Cobrança da entrada', w:'Boleto com Pix emitido pelo Inter.', x:"Obrigado pela confiança! Segue o boleto com Pix da entrada (50%): [link ou código]. Assim que compensar, começo a montar o site.\n\nPreciso do logo, das fotos e das informações (serviços, horários, endereço). Pode me mandar por aqui?" },
+      { id:'c3', t:'Cobrança final', w:'Quando o site estiver aprovado.', x:"O site da {nome} está pronto para a última revisão: [link]. Estando tudo certo, segue o boleto com Pix dos 50% restantes: [link ou código]. Assim que compensar, publico no domínio de vocês." }
+    ]},
+    { g:'Entrega e pós-venda', items:[
+      { id:'e1', t:'Site no ar', w:'Aproveite para oferecer a manutenção.', x:"O site da {nome} está no ar! 🎉 [link]\n\nVale colocar esse link na bio do Instagram e no perfil do Google. Se quiser, posso cuidar da manutenção por R$ 99,90 por mês, com até 2 alterações incluídas." },
+      { id:'e2', t:'Pedir indicação', w:'Uns dias depois da entrega.', x:"Que bom que você gostou! Se conhecer outro negócio que precise de site, pode me indicar? Fico muito grato." }
+    ]},
+    { g:'Quando o cliente tem dúvida', items:[
+      { id:'o1', t:'“Está caro”', w:'Oferece uma versão menor em vez de baixar o preço.', x:"Entendo! O valor cobre o design, a publicação e 2 rodadas de ajustes, e o site fica seu. Se preferir, dá para começar com uma versão mais enxuta, de uma página só, por um valor menor, e ampliar depois. Quer que eu monte essa opção?" },
+      { id:'o2', t:'“Já tenho Instagram”', w:'Mostra que um complementa o outro.', x:"O Instagram é ótimo para mostrar o dia a dia, mas quem pesquisa no Google costuma querer ver serviços, avaliações e endereço num lugar só. E o site é seu, não depende de algoritmo. Os dois se completam: o site leva o link do Instagram e vice-versa." },
+      { id:'o3', t:'“Vou pensar”', w:'Sem pressionar.', x:"Claro, sem pressa! Deixo a prévia com você. Se quiser, me diz o que ficou em dúvida (valor, prazo ou algo no layout) que eu já te respondo." }
+    ]}
+  ];
+  const tplStore = () => jget(K.tpl, {});
+  function tplText(it){ return tplStore()[it.id] ?? it.x; }
+  function fillVars(text, l){
+    const nome = l ? l.name : '[nome da loja]', nicho = l ? (l.niche || 'o seu negócio') : '[nicho]';
+    return text.replaceAll('{nome}', nome).replaceAll('{nicho}', nicho);
+  }
+  function bubbleHtml(text){ return esc(text).replace(/\[[^\]]+\]/g, m => `<mark>${m}</mark>`); }
+  function mLead(){ const id = $('#mLead').value; return leads.find(l=>l.id===id) || null; }
+  function renderMsgOptions(){
+    const sel = $('#mLead'), cur = sel.value;
+    const arr = [...leads].sort((a,b)=>score(b)-score(a));
+    sel.innerHTML = '<option value="">Sem loja (mostra [nome da loja])</option>' + arr.map(l=>`<option value="${l.id}">${esc(l.name)}${l.city?' • '+esc(l.city):''}</option>`).join('');
+    sel.value = arr.some(l=>l.id===cur) ? cur : (arr[0]?.id || '');
+  }
+  const editingTpl = new Set();
+  function renderMsgs(){
+    const l = mLead();
+    $('#msgs').innerHTML = TPL.map(grp => `<div class="mg"><h3>${grp.g}</h3><div class="mgrid">` + grp.items.map(it => {
+      const raw = tplText(it), edited = it.id in tplStore();
+      const body = editingTpl.has(it.id)
+        ? `<textarea data-tid="${it.id}">${esc(raw)}</textarea><div class="row"><button class="btn sm primary" data-ma="save" data-id="${it.id}">Salvar texto</button><button class="btn sm" data-ma="reset" data-id="${it.id}">Voltar ao original</button></div>`
+        : `<div class="wa-bg"><div class="bubble">${bubbleHtml(fillVars(raw, l))}</div></div>`;
+      const phone = l && String(l.phone||'').replace(/\D/g,'');
+      const waUrl = phone ? 'https://wa.me/'+(phone.length<=11?'55':'')+phone+'?text='+encodeURIComponent(fillVars(raw,l)) : '';
+      return `<div class="msg"><div><h4>${it.t}${edited?' <span class="tag">editado</span>':''}</h4><div class="when">${it.w}</div></div>${body}
+        <div class="row">
+          <button class="btn sm primary" data-ma="copy" data-id="${it.id}">Copiar</button>
+          ${waUrl?`<a class="btn sm wa" href="${waUrl}" target="_blank" rel="noopener" data-ma="wa" data-id="${it.id}">Abrir no WhatsApp</a>`:''}
+          <button class="btn sm" data-ma="edit" data-id="${it.id}">${editingTpl.has(it.id)?'Fechar edição':'Editar'}</button>
+          ${grp.g==='Primeiro contato'?`<button class="btn sm" data-ma="use" data-id="${it.id}">Usar no botão das lojas</button>`:''}
+        </div></div>`;
+    }).join('') + '</div></div>').join('');
+  }
+  const findTpl = id => TPL.flatMap(g=>g.items).find(i=>i.id===id);
+
+  // ---------- contrato ----------
+  const ME_DEF = { nome:'GABRIEL OLIVEIRA WIEDENHOFT MACHADO', cnpj:'60.375.868/0001-06', end:'Canoas/RS, bairro Nossa Senhora das Graças', email:'gabrielolwmachado@gmail.com', zap:'(51) 93500-9004' };
+  const getME = () => ({ ...ME_DEF, ...jget(K.me, {}) });
+  const getCF = () => jget(K.contract, {});
+  function ext(n){
+    n = Math.floor(n);
+    const u=['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove','dez','onze','doze','treze','quatorze','quinze','dezesseis','dezessete','dezoito','dezenove'];
+    const d=['','','vinte','trinta','quarenta','cinquenta','sessenta','setenta','oitenta','noventa'];
+    const c=['','cento','duzentos','trezentos','quatrocentos','quinhentos','seiscentos','setecentos','oitocentos','novecentos'];
+    const b1000 = x => { if(x===100) return 'cem'; const s=[]; if(x>=100){ s.push(c[Math.floor(x/100)]); x%=100; }
+      if(x>0){ if(x<20) s.push(u[x]); else { let t=d[Math.floor(x/10)]; if(x%10) t+=' e '+u[x%10]; s.push(t); } } return s.join(' e '); };
+    if(n===0) return 'zero'; if(n<1000) return b1000(n);
+    const m = Math.floor(n/1000), r = n%1000; let s = m===1 ? 'mil' : b1000(m)+' mil';
+    if(r) s += (r<100 || r%100===0 ? ' e ' : ' ') + b1000(r);
+    return s;
+  }
+  function valExt(v){ const i = Math.floor(v), c = Math.round((v-i)*100); return ext(i)+(i===1?' real':' reais')+(c?' e '+ext(c)+(c===1?' centavo':' centavos'):''); }
+  const money = n => n.toLocaleString('pt-BR',{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2});
+  function buildContract(){
+    const f = getCF(), m = getME();
+    const v = (x, ph) => (x && String(x).trim()) ? String(x).trim() : '['+ph+']';
+    const val = num(f.valor), half = val/2;
+    const total = val ? `R$ ${money(val)} (${valExt(val)})` : '[VALOR]';
+    const halfTxt = val ? 'R$ '+money(half) : '[valor]';
+    const man = f.manut==='sim' ? '(X) quero contratar   ( ) não quero agora' : f.manut==='nao' ? '( ) quero contratar   (X) não quero agora' : '( ) quero contratar   ( ) não quero agora';
+    const hoje = new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'}).replace(/ de /,' de ');
+    const C = [];
+    C.push(['1. Partes',[
+      `CONTRATADO(A): ${m.nome}, inscrito no CNPJ nº ${m.cnpj}, com endereço em ${m.end}, e-mail ${m.email}, WhatsApp ${m.zap}. Doravante "Contratado".`,
+      `CONTRATANTE: ${v(f.cliente,'NOME OU RAZÃO SOCIAL DO CLIENTE')}, CPF/CNPJ ${v(f.doc,'número')}, com endereço em ${v(f.endCli,'endereço completo')}, representado(a) por ${v(f.repr,'nome do responsável')}, e-mail ${v(f.emailCli,'e-mail')}, WhatsApp ${v(f.zapCli,'número')}. Doravante "Contratante".`,
+      'As partes combinam o que segue.']]);
+    C.push(['2. Objeto e escopo',[
+      '2.1. O Contratado vai criar e publicar o site do Contratante, com design próprio, adaptado para celular e computador.',
+      '2.2. Estão incluídos no valor deste contrato:',
+      '- Projeto visual (layout, cores e fontes) alinhado com a identidade do Contratante.',
+      `- Páginas ou seções, conforme combinado: ${v(f.escopo,'liste, por exemplo: início, serviços, avaliações, localização e contato')}.`,
+      '- Botões de contato por WhatsApp, telefone e link para o Google Maps.',
+      '- Mapa ou endereço, horário de funcionamento e dados de contato informados pelo Contratante.',
+      '- Configuração básica para o site aparecer corretamente nas buscas (título, descrição e velocidade).',
+      '- Publicação do site no domínio e na hospedagem do Contratante, e orientação de como usá-los.',
+      '2.3. Qualquer item fora desta lista é considerado extra, conforme a cláusula 5.']]);
+    C.push(['3. Preço e pagamento',[
+      '3.1. O valor do site é definido conforme a complexidade do trabalho, dentro destas faixas de referência:',
+      '- Simples (página única, até 5 seções, botões de contato): R$ 800 a R$ 1.200.',
+      '- Intermediário (várias páginas, formulário de contato, galeria, textos mais elaborados): R$ 1.200 a R$ 1.800.',
+      '- Avançado (muitas páginas, animações, mais de um idioma ou design totalmente personalizado): R$ 1.800 a R$ 2.200.',
+      `3.2. Para este contrato, o valor total fechado é de ${total}, já considerando o escopo da cláusula 2.`,
+      '3.3. O pagamento é feito por boleto bancário com Pix ou por QR Code Pix, emitido pelo Contratado em nome do CNPJ indicado na cláusula 1, em duas partes:',
+      `- 50% de entrada (${halfTxt}), até ${v(f.dEntrada,'data')}, para o início do trabalho.`,
+      `- 50% na entrega (${halfTxt}), até ${v(f.dEntrega,'data ou "no dia da aprovação"')}, antes da publicação final do site.`,
+      '3.4. Em caso de atraso no pagamento, incidem multa de 2% sobre o valor em atraso e juros de 1% ao mês.',
+      '3.5. A entrada não é devolvida pelo trabalho já realizado, salvo se o Contratado não entregar o site por motivo seu.']]);
+    C.push(['4. Prazo, revisões e conteúdo do cliente',[
+      `4.1. O Contratado entrega o site em até ${v(f.prazo,'número')} dias úteis, contados do pagamento da entrada e do recebimento de todo o conteúdo da cláusula 4.3.`,
+      '4.2. Estão incluídas 2 rodadas de ajustes sobre o layout e os textos apresentados. Cada rodada reúne todos os pedidos de uma vez. Ajustes além disso são orçados à parte.',
+      '4.3. O Contratante envia ao Contratado, em até 5 dias úteis: logotipo, fotos, textos ou informações dos serviços, horários, endereço e contatos.',
+      '4.4. Se o Contratante atrasar o envio do conteúdo ou as respostas às revisões, o prazo de entrega é prorrogado pelo mesmo número de dias. Se o conteúdo não chegar em 30 dias, o Contratado pode encerrar o projeto e a entrada não é devolvida.',
+      '4.5. Se o Contratante não tiver fotos ou textos, o Contratado pode usar imagens livres de direitos e textos de exemplo, a serem aprovados pelo Contratante antes da publicação.']]);
+    C.push(['5. O que fica de fora',[
+      '5.1. Não fazem parte deste contrato, e são orçados à parte se o Contratante quiser, tudo que exige mais do que criar o site:',
+      '- Pagamento online, como gateway, loja virtual, checkout, parcelamento ou venda de produtos. Esse tipo de recurso só entra no projeto depois de conversa e acordo por escrito sobre escopo e valor.',
+      '- Sistemas com login, área do cliente, banco de dados ou painel administrativo.',
+      '- Agendamento online, prontuário ou integração com outros sistemas.',
+      '- Anúncios pagos (Google, Instagram, Facebook) e otimização avançada para buscas (SEO contínuo).',
+      '- Gestão de redes sociais e criação de posts.',
+      '- Criação de logotipo ou identidade visual completa.',
+      '- Produção de fotos, vídeos e textos extensos.',
+      '- E-mail profissional, blog com publicações frequentes e traduções.',
+      '- Páginas, seções ou funções além das listadas na cláusula 2.',
+      '5.2. Qualquer extra só é feito depois de orçamento aprovado pelo Contratante por escrito (mensagem de WhatsApp vale como aprovação).']]);
+    C.push(['6. Domínio, hospedagem e custos de terceiros',[
+      '6.1. O domínio (o endereço do site) e a hospedagem são contratados em nome do Contratante, e os custos são dele. O Contratado orienta a escolha, ajuda na configuração e, se o Contratante preferir, faz a publicação na conta do próprio Contratante.',
+      '6.2. O Contratante deve escolher uma hospedagem cujos termos permitam uso comercial. O Contratado não se responsabiliza por suspensão do site causada por uso de plano gratuito que não permita fins comerciais, quando essa escolha for feita contra a orientação do Contratado.',
+      '6.3. Ficam por conta do Contratante os valores cobrados por terceiros, como renovação de domínio, hospedagem, plugins pagos, bancos de imagens e ferramentas de e-mail.',
+      '6.4. As senhas e os acessos das contas do Contratante ficam com ele. Se precisar acessar alguma conta, o Contratado pede autorização e não repassa os dados a ninguém.']]);
+    C.push(['7. Propriedade, portfólio e conteúdo publicado',[
+      '7.1. Depois do pagamento integral, o Contratado transfere ao Contratante o direito de uso do site e entrega os arquivos finais. Fontes, bibliotecas e imagens de terceiros continuam sujeitas às licenças originais.',
+      '7.2. O Contratado pode mostrar o site pronto no seu portfólio e em redes sociais, como exemplo de trabalho, sem divulgar dados internos do Contratante.',
+      '7.3. O Contratante responde pela veracidade dos textos e das informações publicadas, e declara ter o direito de usar as fotos, os logos e as avaliações que fornecer.',
+      '7.4. Por se tratar de serviços de saúde e estética, o Contratante é responsável por seguir as regras de publicidade do seu conselho profissional e dos órgãos de vigilância sanitária. Isso inclui não prometer resultado garantido e não publicar imagens de antes e depois quando as regras não permitirem. O Contratado pode sugerir ajustes, mas a decisão final do conteúdo é do Contratante.']]);
+    C.push(['8. Manutenção mensal (opcional)',[
+      `8.1. Depois da entrega, o Contratante pode contratar a manutenção mensal por R$ 99,90 por mês, paga por boleto com Pix emitido pelo Contratado, até o dia ${v(f.diaManut,'dia')} de cada mês. Marque aqui: ${man}.`,
+      '8.2. A manutenção inclui:',
+      '- Até 2 pequenas alterações por mês, como trocar textos, horários, fotos ou links.',
+      '- Correção de erros e de links que parem de funcionar.',
+      '- Suporte por WhatsApp em dias úteis.',
+      '8.3. Não estão incluídos na manutenção: páginas novas, mudança de layout e qualquer item da cláusula 5. Esses serviços são orçados à parte.',
+      '8.4. Nos primeiros 30 dias depois da entrega, erros do trabalho do Contratado são corrigidos sem custo, mesmo sem a manutenção mensal.',
+      '8.5. Qualquer parte pode cancelar a manutenção avisando por escrito com 30 dias de antecedência, sem multa. O valor mensal pode ser reajustado a cada 12 meses, com aviso prévio de 30 dias.']]);
+    C.push(['9. Dados pessoais, rescisão, foro e assinatura',[
+      '9.1. Se o site tiver formulário ou coletar dados de visitantes, o Contratante é o responsável por esses dados, nos termos da Lei Geral de Proteção de Dados (LGPD). O Contratado orienta e inclui uma página simples de política de privacidade, com texto revisado pelo Contratante.',
+      '9.2. Os dois lados mantêm em sigilo as informações não públicas que receberem um do outro por causa deste contrato.',
+      '9.3. Qualquer parte pode encerrar o contrato por escrito. Se o Contratante encerrar antes da entrega, paga pelo trabalho já feito, que não passa do valor da entrada, salvo se mais da metade do trabalho já estiver pronta, caso em que o valor é proporcional.',
+      '9.4. O Contratado não garante número de visitas, clientes ou vendas gerados pelo site, pois isso depende de fatores fora do seu controle.',
+      '9.5. Este contrato pode ser assinado eletronicamente, por exemplo pelo gov.br, nos termos da Lei nº 14.063/2020. Cada parte declara ter lido e aceitado todas as cláusulas.',
+      '9.6. Fica eleito o foro da comarca de Canoas/RS para resolver qualquer dúvida deste contrato.',
+      `Canoas/RS, ${hoje}.`]]);
+    return { C, m, cliente: v(f.cliente,'NOME DO CLIENTE'), doc: v(f.doc,'CPF/CNPJ') };
+  }
+  function clauseText(c){ return c[0]+'\n'+c[1].join('\n'); }
+  function contractPlain(){ const { C, m, cliente, doc } = buildContract();
+    return 'CONTRATO DE PRESTAÇÃO DE SERVIÇOS: CRIAÇÃO DE SITE\n\n' + C.map(clauseText).join('\n\n') +
+      `\n\nCONTRATADO(A): ______________________________  ${m.nome}  CNPJ ${m.cnpj}\nCONTRATANTE: ______________________________  ${cliente}  ${doc}`; }
+  function paraHtml(p){
+    const h = esc(p).replace(/\[[^\]]+\]/g, x=>`<mark>${x}</mark>`);
+    return h.replace(/^(\d+\.\d+\.)/, '<b>$1</b>').replace(/^(CONTRATADO\(A\):|CONTRATANTE:)/, '<b>$1</b>');
+  }
+  function renderContrato(){
+    const { C, m, cliente, doc } = buildContract();
+    $('#cdoc').innerHTML = '<h1>CONTRATO DE PRESTAÇÃO DE SERVIÇOS: CRIAÇÃO DE SITE</h1>' + C.map((c,i) => {
+      let html = '', inList = false;
+      c[1].forEach(p => {
+        if(p.startsWith('- ')){ if(!inList){ html += '<ul>'; inList = true; } html += '<li>'+paraHtml(p.slice(2))+'</li>'; }
+        else { if(inList){ html += '</ul>'; inList = false; } html += '<p>'+paraHtml(p)+'</p>'; }
+      });
+      if(inList) html += '</ul>';
+      return `<section class="clause"><div class="ch"><h3>${esc(c[0])}</h3><button class="cp" data-cp="${i}">Copiar cláusula</button></div>${html}</section>`;
+    }).join('') + `<div class="sig"><div><b>CONTRATADO(A)</b><br>${esc(m.nome)}<br>CNPJ ${esc(m.cnpj)}</div><div><b>CONTRATANTE</b><br>${paraHtml(cliente)}<br>${paraHtml(doc)}</div></div>`;
+  }
+  function loadContractForm(){
+    const f = getCF(), m = getME();
+    $$('[data-c]').forEach(el => { el.value = f[el.dataset.c] ?? ''; });
+    $$('[data-m]').forEach(el => { el.value = m[el.dataset.m] ?? ''; });
+    const sel = $('#cLead'), arr = [...leads].sort((a,b)=>score(b)-score(a));
+    sel.innerHTML = '<option value="">Escolher…</option>' + arr.map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join('');
+  }
+
+  // ---------- passo a passo ----------
+  const STEPS = [
+    { g:'Antes do primeiro cliente (uma vez só)', items:[
+      { id:'s1', t:'Conferir o CNAE do MEI', d:'Veja se o seu MEI tem uma atividade que cubra criar sites. A principal hoje é treinamento em informática. Se faltar, inclua no Portal do Empreendedor, sem custo.' },
+      { id:'s2', t:'Conta PJ e cobrança no Inter', d:'Use a conta do CNPJ para emitir boleto com Pix. Confira se há tarifa por boleto.' },
+      { id:'s3', t:'Conta gov.br nível prata ou ouro', d:'É o que permite assinar o contrato de graça, com validade jurídica. O cliente também precisa de conta nesse nível, ou aceita por escrito no WhatsApp.' },
+      { id:'s4', t:'Revisar o contrato uma vez', d:'Leve o modelo a um advogado para uma conferência rápida e a um contador para saber como emitir a nota.', go:['contrato','Abrir contrato'] }
+    ]},
+    { g:'Para cada cliente', items:[
+      { id:'c1', t:'Escolher a loja alvo', d:'Filtre por “Sem site” e comece pelas com mais avaliações. Confira na ficha do Maps se ainda não tem site.', go:['leads','Ir para Leads'] },
+      { id:'c2', t:'Mandar a primeira mensagem', d:'Use “Pergunta curiosa” ou “Cliente que pesquisa”. Ao tocar em WhatsApp, a loja vira Contatado.', go:['msgs','Ver mensagens'] },
+      { id:'c3', t:'Enviar a prévia', d:'Mande a imagem do topo do site de exemplo. Marque “Viu” se os tiques ficarem azuis no WhatsApp Business, e “Respondeu” quando ela responder.' },
+      { id:'c4', t:'Mandar a proposta', d:'Escolha o valor na faixa de R$ 800 a R$ 2.200 conforme o trabalho. Marque “Enviei proposta”.', go:['msgs','Resumo da proposta'] },
+      { id:'c5', t:'Preencher e enviar o contrato', d:'Preencha os dados do cliente, salve em PDF e assine pelo gov.br.', go:['contrato','Abrir contrato'] },
+      { id:'c6', t:'Cobrar a entrada de 50%', d:'Boleto com Pix pelo Inter. Só comece o trabalho depois de compensar. Marque “Fechou” e informe o valor: ele entra no gráfico.' },
+      { id:'c7', t:'Receber o material e construir', d:'Logo, fotos, serviços, horários e endereço. Respeite o prazo do contrato.' },
+      { id:'c8', t:'Rodadas de ajuste (até 2)', d:'Peça para o cliente mandar todos os ajustes de uma vez, por rodada.' },
+      { id:'c9', t:'Cobrar os 50% finais e publicar', d:'Domínio e hospedagem no nome do cliente, em um plano que permita uso comercial.' },
+      { id:'c10', t:'Oferecer a manutenção e pedir indicação', d:'R$ 99,90 por mês. Marque “com manutenção” na venda para somar na recorrência.', go:['msgs','Mensagens de entrega'] }
+    ]}
+  ];
+  function renderSteps(){
+    const done = jget(K.steps, {}), all = STEPS.flatMap(g=>g.items), n = all.filter(i=>done[i.id]).length;
+    $('#progBar').style.width = Math.round(n/all.length*100)+'%';
+    $('#progTxt').textContent = `${n} de ${all.length} passos`;
+    $('#steps').innerHTML = STEPS.map(g => `<div class="panel sg"><h3>${g.g}</h3>` + g.items.map(i =>
+      `<div class="step ${done[i.id]?'done':''}"><input type="checkbox" id="st-${i.id}" data-step="${i.id}" ${done[i.id]?'checked':''}>
+        <div><label for="st-${i.id}"><b>${i.t}</b></label><p>${i.d}</p>${i.go?`<button class="btn sm go" data-v="${i.go[0]}">${i.go[1]}</button>`:''}</div></div>`).join('') + '</div>').join('');
   }
 
   // ---------- CSV ----------
@@ -419,46 +971,76 @@ dialog textarea{min-height:110px}
     document.body.appendChild(a); a.click(); a.remove();
   }
 
-  // ---------- eventos ----------
+
+  // ---------- lista automática (leads.json) ----------
+  const keyOf = l => norm(l.name)+'|'+String(l.phone||'').replace(/\D/g,'');
+  const dismissed = () => new Set(jget(K.dis, []));
+  function dismiss(l){ const d = dismissed(); d.add(keyOf(l)); jset(K.dis, [...d]); }
+  async function loadSeed(){
+    try {
+      const r = await fetch('leads.json', {cache:'no-store'}); if(!r.ok) return;
+      const arr = await r.json(); if(!Array.isArray(arr)) return;
+      const have = new Set(leads.map(keyOf)), gone = dismissed(); let added = 0;
+      for(const o of arr){
+        if(!o || !o.name) continue; const k = keyOf(o);
+        if(have.has(k) || gone.has(k)) continue;
+        have.add(k);
+        leads.push({ id:uid(), name:o.name, phone:o.phone||'', address:o.address||'', city:o.city||'', niche:o.niche||'',
+          rating:o.rating||'', reviews:o.reviews||'', website:o.website||'', instagram:o.instagram||'',
+          siteStatus:o.siteStatus||'desconhecido', status:'novo', notes:'', createdAt:Date.now() });
+        added++;
+      }
+      if(added){ save(); renderView(current); toast(added+' lojas novas na lista'); }
+    } catch {}
+  }
+
+  // ---------- render central ----------
+  function renderView(v){
+    renderSub();
+    if(v==='painel') renderPainel();
+    else if(v==='leads') renderLeads();
+    else if(v==='msgs'){ renderMsgOptions(); renderMsgs(); }
+    else if(v==='contrato'){ loadContractForm(); renderContrato(); }
+    else if(v==='passos') renderSteps();
+  }
+  const render = () => renderView(current);
+
+  // ---------- eventos: leads ----------
   $('#kpis').addEventListener('click', e=>{
     const k = e.target.closest('.kpi'); if(!k) return;
     kpiFilter = (kpiFilter===k.dataset.k) ? '' : k.dataset.k;
     if(kpiFilter) $('#fSite').value='todos';
-    render();
+    renderLeads();
   });
-  ['#q','#fSite','#fCity','#fNiche','#fSort'].forEach(s=>$(s).addEventListener('input',render));
-
+  ['#q','#fSite','#fCity','#fNiche','#fSort'].forEach(s=>$(s).addEventListener('input',renderLeads));
   $('#list').addEventListener('change', e=>{
     const el = e.target.closest('[data-f]'); if(!el) return;
     const l = leads.find(x=>x.id===el.closest('.card').dataset.id); if(!l) return;
-    l[el.dataset.f] = el.value;
-    if(el.dataset.f==='siteStatus' && el.value!=='sim') {} // mantém website digitado
-    save(); render();
+    if(el.dataset.f==='status'){ changeStatus(l, el.value); return; }
+    l[el.dataset.f] = el.value; save(); render();
   });
   $('#list').addEventListener('click', e=>{
     const b = e.target.closest('[data-act]'); if(!b) return;
     const card = b.closest('.card'); const l = leads.find(x=>x.id===card.dataset.id); if(!l) return;
-    if(b.dataset.act==='wa'){
-      if((l.status||'novo')==='novo'){ l.status='contatado'; save(); setTimeout(render,400); }
-    } else if(b.dataset.act==='del'){
-      if(confirm('Excluir "'+l.name+'"?')){ dismiss(l); leads = leads.filter(x=>x.id!==l.id); save(); render(); }
-    } else if(b.dataset.act==='edit'){ openEdit(l); }
+    const a = b.dataset.act;
+    if(a==='wa'){ if((l.status||'novo')==='novo'){ setStatus(l,'contatado'); save(); setTimeout(render,400); } }
+    else if(a==='go'){ changeStatus(l, b.dataset.s); }
+    else if(a==='sale'){ askSale(l); }
+    else if(a==='del'){ if(confirm('Excluir "'+l.name+'"?')){ dismiss(l); leads = leads.filter(x=>x.id!==l.id); save(); render(); } }
+    else if(a==='edit'){ openEdit(l); }
   });
-  // notas: salva ao sair do campo, sem re-renderizar
   $('#list').addEventListener('focusout', e=>{
     if(e.target.dataset.f!=='notes') return;
     const l = leads.find(x=>x.id===e.target.closest('.card').dataset.id);
     if(l && l.notes!==e.target.value){ l.notes=e.target.value; save(); }
   });
-
   document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));
-
   $('#bImport').onclick = ()=> $('#dImport').showModal();
   $('#csvFile').addEventListener('change', async e=>{ const f=e.target.files[0]; if(f) $('#csvText').value = await f.text(); });
   $('#doImport').onclick = ()=>{ const t=$('#csvText').value.trim(); if(!t) return toast('Cole um CSV ou escolha um arquivo'); importCSV(t); $('#csvText').value=''; $('#dImport').close(); };
   $('#bExport').onclick = ()=> leads.length ? exportCSV() : toast('Nada para exportar');
   $('#bMsg').onclick = ()=>{ $('#msgText').value = msgTpl(); $('#dMsg').showModal(); };
-  $('#saveMsg').onclick = ()=>{ try{ localStorage.setItem(MSGKEY,$('#msgText').value); }catch{} $('#dMsg').close(); render(); toast('Modelo salvo'); };
+  $('#saveMsg').onclick = ()=>{ try{ localStorage.setItem(K.msg,$('#msgText').value); }catch{} $('#dMsg').close(); render(); toast('Modelo salvo'); };
 
   let editing = null;
   function openAdd(){ editing=null; $('#addTitle').textContent='Nova loja'; $('#fAdd').reset(); $('#dAdd').showModal(); }
@@ -469,14 +1051,93 @@ dialog textarea{min-height:110px}
   }
   $('#bAdd').onclick = openAdd;
   $('#fAdd').addEventListener('submit', e=>{
-    const f = e.target; const d = Object.fromEntries(new FormData(f));
+    const d = Object.fromEntries(new FormData(e.target));
     if(!d.name.trim()) return;
     if(editing){ Object.assign(leads.find(x=>x.id===editing), d); }
     else leads.push({ id:uid(), status:'novo', notes:'', createdAt:Date.now(), ...d });
     save(); render();
   });
+  $('#fSale').addEventListener('submit', e=>{
+    if(!saleLead) return;
+    const f = e.target.elements, valor = num(f.valor.value);
+    saleLead.valor = valor; saleLead.manut = f.manut.checked;
+    if(f.data.value){ const [y,m,d] = f.data.value.split('-').map(Number); saleLead.fechadoEm = new Date(y,m-1,d,12).getTime(); }
+    save(); saleLead = null; render(); toast('Venda registrada');
+  });
 
-  render();
+  // ---------- eventos: painel ----------
+  $('#stats').addEventListener('click', e=>{
+    if(!e.target.closest('#metaBox')) return;
+    const v = prompt('Meta de vendas do mês (R$):', getMeta()); if(v===null) return;
+    const n = num(v); if(n>0){ jset(K.meta, n); renderPainel(); }
+  });
+  $('#groups').addEventListener('click', e=>{
+    const b = e.target.closest('[data-open]'); if(!b) return;
+    const l = leads.find(x=>x.id===b.dataset.open); if(!l) return;
+    kpiFilter = ''; $('#q').value = l.name; $('#fSite').value = 'todos'; $('#fCity').value=''; $('#fNiche').value='';
+    show('leads');
+  });
+  $('#bBackup').onclick = ()=>{
+    const data = {}; for(let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if(k.startsWith('leadsSites.')) data[k] = localStorage.getItem(k); }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(data,null,1)],{type:'application/json'}));
+    a.download = 'backup-leads-sites-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+  $('#bRestore').onclick = ()=> $('#fRestore').click();
+  $('#fRestore').addEventListener('change', async e=>{
+    const f = e.target.files[0]; if(!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      if(!confirm('Isto substitui os dados deste aparelho pelos do backup. Continuar?')) return;
+      Object.entries(data).forEach(([k,v])=>{ if(k.startsWith('leadsSites.')) localStorage.setItem(k, v); });
+      location.reload();
+    } catch { toast('Arquivo de backup inválido'); }
+  });
+
+  // ---------- eventos: mensagens ----------
+  $('#mLead').addEventListener('input', renderMsgs);
+  $('#msgs').addEventListener('click', e=>{
+    const b = e.target.closest('[data-ma]'); if(!b) return;
+    const it = findTpl(b.dataset.id), a = b.dataset.ma, l = mLead();
+    if(a==='copy') copyText(fillVars(tplText(it), l), 'Mensagem copiada');
+    else if(a==='edit'){ editingTpl.has(it.id) ? editingTpl.delete(it.id) : editingTpl.add(it.id); renderMsgs(); }
+    else if(a==='save'){ const ta = $(`textarea[data-tid="${it.id}"]`); const s = tplStore(); s[it.id] = ta.value; jset(K.tpl, s); editingTpl.delete(it.id); renderMsgs(); toast('Texto salvo'); }
+    else if(a==='reset'){ const s = tplStore(); delete s[it.id]; jset(K.tpl, s); editingTpl.delete(it.id); renderMsgs(); }
+    else if(a==='use'){ try{ localStorage.setItem(K.msg, tplText(it)); }catch{} toast('Agora o botão WhatsApp das lojas usa este texto'); }
+  });
+
+  // ---------- eventos: contrato ----------
+  $('#v-contrato').addEventListener('input', e=>{
+    const c = e.target.dataset.c, m = e.target.dataset.m;
+    if(c){ const f = getCF(); f[c] = e.target.value; jset(K.contract, f); renderContrato(); }
+    else if(m){ const x = jget(K.me, {}); x[m] = e.target.value; jset(K.me, x); renderContrato(); }
+  });
+  $('#cLead').addEventListener('change', e=>{
+    const l = leads.find(x=>x.id===e.target.value); if(!l) return;
+    const f = getCF(); f.cliente = l.name; f.endCli = [l.address].filter(Boolean).join(', ') || f.endCli || ''; f.zapCli = l.phone || f.zapCli || '';
+    if(l.valor) f.valor = String(l.valor);
+    jset(K.contract, f); loadContractForm(); renderContrato();
+  });
+  $('#cClear').onclick = ()=>{ if(confirm('Limpar todos os dados do cliente?')){ jset(K.contract, {}); loadContractForm(); renderContrato(); } };
+  $('#cCopy').onclick = ()=> copyText(contractPlain(), 'Contrato copiado');
+  $('#cPrint').onclick = ()=> window.print();
+  $('#cWa').onclick = ()=> copyText('Segue o contrato para assinatura (pelo gov.br ou com um “li e aceito” por aqui). Assim os dois ficam protegidos e o combinado fica registrado. Qualquer dúvida em alguma cláusula, me pergunte.', 'Texto copiado');
+  $('#cdoc').addEventListener('click', e=>{
+    const b = e.target.closest('[data-cp]'); if(!b) return;
+    copyText(clauseText(buildContract().C[Number(b.dataset.cp)]), 'Cláusula copiada');
+  });
+
+  // ---------- eventos: passos ----------
+  $('#steps').addEventListener('change', e=>{
+    const id = e.target.dataset.step; if(!id) return;
+    const d = jget(K.steps, {}); if(e.target.checked) d[id]=true; else delete d[id]; jset(K.steps, d); renderSteps();
+  });
+  $('#stepsReset').onclick = ()=>{ if(confirm('Desmarcar todos os passos “Para cada cliente”?')){
+    const d = jget(K.steps, {}); STEPS[1].items.forEach(i=>delete d[i.id]); jset(K.steps, d); renderSteps(); } };
+
+  // ---------- início ----------
+  show(location.hash.slice(1) || 'painel', false);
   loadSeed();
 })();
 </script>
