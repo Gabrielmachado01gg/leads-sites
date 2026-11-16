@@ -325,6 +325,29 @@ dialog textarea{min-height:110px}
     }
   }
 
+  // ---------- lista automática (leads.json) ----------
+  const DISKEY = 'leadsSites.dismissed';
+  const keyOf = l => norm(l.name)+'|'+String(l.phone||'').replace(/\D/g,'');
+  function dismissed(){ try { return new Set(JSON.parse(localStorage.getItem(DISKEY))||[]); } catch { return new Set(); } }
+  function dismiss(l){ try { const d=dismissed(); d.add(keyOf(l)); localStorage.setItem(DISKEY, JSON.stringify([...d])); } catch {} }
+  async function loadSeed(){
+    try {
+      const r = await fetch('leads.json', {cache:'no-store'}); if(!r.ok) return;
+      const arr = await r.json(); if(!Array.isArray(arr)) return;
+      const have = new Set(leads.map(keyOf)), gone = dismissed(); let added = 0;
+      for(const o of arr){
+        if(!o || !o.name) continue; const k = keyOf(o);
+        if(have.has(k) || gone.has(k)) continue;
+        have.add(k);
+        leads.push({ id:uid(), name:o.name, phone:o.phone||'', address:o.address||'', city:o.city||'', niche:o.niche||'',
+          rating:o.rating||'', reviews:o.reviews||'', website:o.website||'', instagram:o.instagram||'',
+          siteStatus:o.siteStatus||'desconhecido', status:'novo', notes:'', createdAt:Date.now() });
+        added++;
+      }
+      if(added){ save(); render(); toast(added+' lojas novas na lista'); }
+    } catch {}
+  }
+
   // ---------- CSV ----------
   function parseCSV(text){
     text = text.replace(/^﻿/,'');
@@ -418,7 +441,7 @@ dialog textarea{min-height:110px}
     if(b.dataset.act==='wa'){
       if((l.status||'novo')==='novo'){ l.status='contatado'; save(); setTimeout(render,400); }
     } else if(b.dataset.act==='del'){
-      if(confirm('Excluir "'+l.name+'"?')){ leads = leads.filter(x=>x.id!==l.id); save(); render(); }
+      if(confirm('Excluir "'+l.name+'"?')){ dismiss(l); leads = leads.filter(x=>x.id!==l.id); save(); render(); }
     } else if(b.dataset.act==='edit'){ openEdit(l); }
   });
   // notas: salva ao sair do campo, sem re-renderizar
@@ -454,6 +477,7 @@ dialog textarea{min-height:110px}
   });
 
   render();
+  loadSeed();
 })();
 </script>
 </body>
