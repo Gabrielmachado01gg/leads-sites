@@ -95,7 +95,7 @@ dialog textarea{min-height:110px}
       <option value="alvo">🎯 Sem site (alvos)</option>
       <option value="todos">Todos</option>
       <option value="nao">Sem site e sem Instagram</option>
-      <option value="insta">Só Instagram</option>
+      <option value="insta">Sem site próprio</option>
       <option value="desconhecido">Site não verificado</option>
       <option value="sim">Já tem site</option>
     </select>
@@ -152,7 +152,7 @@ dialog textarea{min-height:110px}
     <select name="siteStatus">
       <option value="desconhecido">Não verifiquei ainda</option>
       <option value="nao">Não tem site</option>
-      <option value="insta">Só Instagram/Facebook</option>
+      <option value="insta">Sem site próprio (rede social/blog)</option>
       <option value="sim">Tem site</option>
     </select>
     <div class="actions">
@@ -211,7 +211,7 @@ dialog textarea{min-height:110px}
   function siteState(l){
     if(l.siteStatus && l.siteStatus!=='desconhecido') return l.siteStatus;
     const w = norm(l.website);
-    if(w){ return /instagram|facebook|linktr|wa\.me|whatsapp|bio\.site/.test(w) ? 'insta' : 'sim'; }
+    if(w){ return /instagram|facebook|linktr|wa\.me|whatsapp|bio\.site|blogspot|mailchimpsites|wixsite|business\.site|sites\.google|linkin\.bio|beacons\.ai/.test(w) ? 'insta' : 'sim'; }
     return 'desconhecido';
   }
   function score(l){
@@ -276,7 +276,7 @@ dialog textarea{min-height:110px}
   function cardHtml(l){
     const st = siteState(l);
     const tag = st==='nao' ? '<span class="tag nosite">Sem site</span>'
-      : st==='insta' ? '<span class="tag insta">Só Instagram</span>'
+      : st==='insta' ? '<span class="tag insta">Sem site próprio</span>'
       : st==='sim' ? '<span class="tag hassite">Tem site</span>'
       : '<span class="tag">Site não verificado</span>';
     const wa = waLink(l), ig = instaLink(l.instagram);
@@ -300,7 +300,7 @@ dialog textarea{min-height:110px}
         <select data-f="siteStatus" aria-label="Tem site?">
           <option value="desconhecido" ${st==='desconhecido'?'selected':''}>Site: não verificado</option>
           <option value="nao" ${st==='nao'?'selected':''}>Site: não tem</option>
-          <option value="insta" ${st==='insta'?'selected':''}>Site: só Instagram</option>
+          <option value="insta" ${st==='insta'?'selected':''}>Site: sem site próprio</option>
           <option value="sim" ${st==='sim'?'selected':''}>Site: já tem</option>
         </select>
       </div>
@@ -376,7 +376,7 @@ dialog textarea{min-height:110px}
       let siteStatus = 'desconhecido';
       if(idx.website>=0){
         if(!website) siteStatus = instagram ? 'insta' : 'nao';
-        else siteStatus = /instagram|facebook|linktr|wa\.me|whatsapp|bio\.site/.test(norm(website)) ? 'insta' : 'sim';
+        else siteStatus = /instagram|facebook|linktr|wa\.me|whatsapp|bio\.site|blogspot|mailchimpsites|wixsite|business\.site|sites\.google|linkin\.bio|beacons\.ai/.test(norm(website)) ? 'insta' : 'sim';
       }
       leads.push({ id:uid(), name, phone:g('phone'), address:g('address'), city:g('city'), niche:g('niche'),
         rating:g('rating'), reviews:g('reviews'), website, instagram,
