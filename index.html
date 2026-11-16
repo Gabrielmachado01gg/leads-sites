@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Leads">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Leads de Sites</title>
+<style>
+:root{
+  --bg:#0f172a;--panel:#111c33;--panel2:#16233f;--line:#22304f;--text:#e8eefc;--muted:#8fa0c4;
+  --brand:#4f8cff;--ok:#2fbf71;--warn:#f5a524;--bad:#ef5b5b;--r:14px;
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) calc(80px + env(safe-area-inset-bottom)) env(safe-area-inset-left)}
+header{display:flex;align-items:center;gap:12px;padding:16px;position:sticky;top:0;background:rgba(15,23,42,.92);backdrop-filter:blur(8px);z-index:20;border-bottom:1px solid var(--line)}
+header{flex-wrap:wrap;gap:8px 8px}
+header h1{font-size:18px;font-weight:700;flex:1 1 100%}
+@media(min-width:600px){header h1{flex:1 1 auto}}
+header h1 small{display:block;font-size:12px;font-weight:400;color:var(--muted)}
+button,select,input,textarea{font:inherit;color:inherit}
+.btn{background:var(--panel2);border:1px solid var(--line);padding:9px 14px;border-radius:10px;cursor:pointer;min-height:40px;
+  color:var(--text);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;text-align:center}
+.btn:hover{border-color:var(--brand)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+.btn.wa{background:#1fa855;border-color:#1fa855;color:#fff;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn.sm{padding:6px 10px;min-height:34px;font-size:13px}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.kpis{display:flex;gap:10px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.kpis::-webkit-scrollbar{display:none}
+.kpi{flex:0 0 118px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;cursor:pointer}
+@media(min-width:700px){.kpis{display:grid;grid-template-columns:repeat(5,1fr);overflow:visible}.kpi{flex:none}}
+.kpi.active{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand) inset}
+.kpi b{display:block;font-size:24px}
+.kpi span{font-size:12px;color:var(--muted)}
+.bar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.bar #q,.bar #fSite{grid-column:1/-1}
+@media(min-width:800px){.bar{grid-template-columns:2fr 1fr 1fr 1fr 1fr}.bar #q,.bar #fSite{grid-column:auto}}
+.bar input,.bar select{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:42px}
+.count{color:var(--muted);font-size:13px;margin:4px 2px 10px}
+/* cards (mobile) and table (desktop) */
+.list{display:grid;gap:10px}
+@media(min-width:900px){.list{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1150px){.list{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.card h3{font-size:16px;line-height:1.25}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--muted)}
+.tag{background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:2px 9px;font-size:12px}
+.tag.nosite{border-color:var(--ok);color:var(--ok)}
+.tag.insta{border-color:var(--warn);color:var(--warn)}
+.tag.hassite{border-color:var(--bad);color:var(--bad)}
+.addr{color:var(--muted);font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1;min-width:110px}
+.card select,.card textarea{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+.card textarea{min-height:56px;resize:vertical;font-size:14px}
+.st-novo{border-left:4px solid var(--muted)}.st-contatado{border-left:4px solid var(--warn)}
+.st-respondeu{border-left:4px solid var(--brand)}.st-proposta{border-left:4px solid #a78bfa}
+.st-fechado{border-left:4px solid var(--ok)}.st-perdido{border-left:4px solid var(--bad);opacity:.7}
+.empty{text-align:center;color:var(--muted);padding:48px 16px;border:1px dashed var(--line);border-radius:var(--r)}
+.empty b{color:var(--text);display:block;font-size:17px;margin-bottom:6px}
+/* dialogs */
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:18px;padding:18px;width:min(560px,94vw);max-height:92vh;overflow:auto}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+dialog h2{font-size:17px;margin-bottom:10px}
+dialog label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+dialog input,dialog textarea,dialog select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
+dialog textarea{min-height:110px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;font-size:28px;line-height:1;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:30;border:0;background:var(--brand);color:#fff;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#000c;border:1px solid var(--line);padding:10px 16px;border-radius:99px;font-size:14px;z-index:50;opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <h1>Leads de Sites<small id="sub"></small></h1>
+  <button class="btn sm" id="bImport">Importar</button>
+  <button class="btn sm" id="bExport">Exportar</button>
+  <button class="btn sm" id="bMsg">Mensagem</button>
+</header>
+
+<main>
+  <section class="kpis" id="kpis"></section>
+
+  <section class="bar">
+    <input id="q" type="search" placeholder="Buscar por nome, bairro, telefone…">
+    <select id="fSite">
+      <option value="alvo">🎯 Sem site (alvos)</option>
+      <option value="todos">Todos</option>
+      <option value="nao">Sem site e sem Instagram</option>
+      <option value="insta">Só Instagram</option>
+      <option value="desconhecido">Site não verificado</option>
+      <option value="sim">Já tem site</option>
+    </select>
+    <select id="fCity"><option value="">Todas as cidades</option></select>
+    <select id="fNiche"><option value="">Todos os nichos</option></select>
+    <select id="fSort">
+      <option value="score">Melhores primeiro</option>
+      <option value="reviews">Mais avaliações</option>
+      <option value="rating">Maior nota</option>
+      <option value="name">Nome (A–Z)</option>
+      <option value="recent">Adicionados recentemente</option>
+    </select>
+  </section>
+
+  <div class="count" id="count"></div>
+  <section class="list" id="list"></section>
+</main>
+
+<button class="fab" id="bAdd" aria-label="Adicionar loja">+</button>
+<div class="toast" id="toast"></div>
+
+<!-- Importar -->
+<dialog id="dImport">
+  <h2>Importar lojas</h2>
+  <label>Cole aqui o conteúdo de um CSV (Outscraper, Apify ou planilha)</label>
+  <textarea id="csvText" placeholder="name,phone,address,city,niche,rating,reviews,website,instagram"></textarea>
+  <label>…ou escolha um arquivo .csv</label>
+  <input type="file" id="csvFile" accept=".csv,text/csv,text/plain">
+  <p class="hint">Colunas reconhecidas (em português ou inglês): nome/name, telefone/phone, endereço/address, cidade/city, nicho/category, nota/rating, avaliações/reviews, site/website, instagram. Lojas repetidas (mesmo nome + telefone) são ignoradas.</p>
+  <div class="actions">
+    <button class="btn" data-close>Cancelar</button>
+    <button class="btn primary" id="doImport">Importar</button>
+  </div>
+</dialog>
+
+<!-- Adicionar / editar -->
+<dialog id="dAdd">
+  <h2 id="addTitle">Nova loja</h2>
+  <form id="fAdd" method="dialog">
+    <label>Nome *</label><input name="name" required>
+    <label>Telefone / WhatsApp</label><input name="phone" inputmode="tel" placeholder="(51) 99999-9999">
+    <label>Endereço</label><input name="address">
+    <div class="row">
+      <div><label>Cidade</label><input name="city"></div>
+      <div><label>Nicho</label><input name="niche" placeholder="barbearia, pet shop…"></div>
+    </div>
+    <div class="row">
+      <div><label>Nota</label><input name="rating" inputmode="decimal"></div>
+      <div><label>Nº de avaliações</label><input name="reviews" inputmode="numeric"></div>
+    </div>
+    <label>Instagram (link ou @)</label><input name="instagram">
+    <label>Site atual (deixe vazio se não tem)</label><input name="website">
+    <label>Tem site?</label>
+    <select name="siteStatus">
+      <option value="desconhecido">Não verifiquei ainda</option>
+      <option value="nao">Não tem site</option>
+      <option value="insta">Só Instagram/Facebook</option>
+      <option value="sim">Tem site</option>
+    </select>
+    <div class="actions">
+      <button type="button" class="btn" data-close>Cancelar</button>
+      <button class="btn primary" value="ok">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Mensagem -->
+<dialog id="dMsg">
+  <h2>Mensagem do WhatsApp</h2>
+  <label>Modelo (use {nome} e {nicho})</label>
+  <textarea id="msgText"></textarea>
+  <p class="hint">Vale personalizar: cite algo real da loja (nota alta, bairro). Fale do ganho dela, e não de tecnologia. Ofereça mostrar um exemplo pronto.</p>
+  <div class="actions">
+    <button class="btn" data-close>Fechar</button>
+    <button class="btn primary" id="saveMsg">Salvar modelo</button>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  const STATUSES = [
+    ['novo','Novo'],['contatado','Contatado'],['respondeu','Respondeu'],
+    ['proposta','Proposta enviada'],['fechado','Fechado ✅'],['perdido','Sem interesse']
+  ];
+  const DEFAULT_MSG = "Oi, tudo bem? Vi a {nome} no Google e reparei que vocês têm ótimas avaliações, mas ainda não têm um site. Montei um exemplo de como poderia ficar para {nicho} e queria te mostrar, sem compromisso. Posso enviar por aqui?";
+  const KEY = 'leadsSites.v1', MSGKEY = 'leadsSites.msg';
+  const $ = s => document.querySelector(s);
+  let leads = load();
+  let kpiFilter = '';
+
+  function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(leads)); } catch { toast('Não consegui salvar neste navegador'); } }
+  function msgTpl(){ try { return localStorage.getItem(MSGKEY) || DEFAULT_MSG; } catch { return DEFAULT_MSG; } }
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+
+  function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('show'),2200); }
+
+  function waLink(l){
+    let d = String(l.phone||'').replace(/\D/g,'');
+    if(!d) return '';
+    if(d.length<=11) d = '55'+d;
+    const text = msgTpl().replaceAll('{nome}', l.name).replaceAll('{nicho}', l.niche || 'o seu negócio');
+    return 'https://wa.me/'+d+'?text='+encodeURIComponent(text);
+  }
+  function instaLink(v){
+    v = String(v||'').trim(); if(!v) return '';
+    if(/^https?:/i.test(v)) return v;
+    return 'https://instagram.com/'+v.replace(/^@/,'');
+  }
+  // estado do site: nao | insta | sim | desconhecido
+  function siteState(l){
+    if(l.siteStatus && l.siteStatus!=='desconhecido') return l.siteStatus;
+    const w = norm(l.website);
+    if(w){ return /instagram|facebook|linktr|wa\.me|whatsapp|bio\.site/.test(w) ? 'insta' : 'sim'; }
+    return 'desconhecido';
+  }
+  function score(l){
+    const s = siteState(l);
+    const base = (s==='nao'||s==='insta') ? 1000 : s==='desconhecido' ? 300 : 0;
+    return base + (Number(l.reviews)||0) * 0.5 + (Number(l.rating)||0) * 20 + (l.phone?30:0);
+  }
+
+  function filtered(){
+    const q = norm($('#q').value), fs = $('#fSite').value, fc = $('#fCity').value, fn = $('#fNiche').value;
+    let r = leads.filter(l => {
+      const st = siteState(l);
+      if(fs==='alvo' && !(st==='nao'||st==='insta')) return false;
+      if(fs==='nao' && st!=='nao') return false;
+      if(fs==='insta' && st!=='insta') return false;
+      if(fs==='desconhecido' && st!=='desconhecido') return false;
+      if(fs==='sim' && st!=='sim') return false;
+      if(fc && l.city!==fc) return false;
+      if(fn && l.niche!==fn) return false;
+      if(kpiFilter && l.status!==kpiFilter) return false;
+      if(q && !norm([l.name,l.address,l.city,l.niche,l.phone].join(' ')).includes(q)) return false;
+      return true;
+    });
+    const so = $('#fSort').value;
+    r.sort((a,b)=>{
+      if(so==='name') return a.name.localeCompare(b.name,'pt-BR');
+      if(so==='reviews') return (Number(b.reviews)||0)-(Number(a.reviews)||0);
+      if(so==='rating') return (Number(b.rating)||0)-(Number(a.rating)||0);
+      if(so==='recent') return (b.createdAt||0)-(a.createdAt||0);
+      return score(b)-score(a);
+    });
+    return r;
+  }
+
+  function renderKpis(){
+    const counts = Object.fromEntries(STATUSES.map(([k])=>[k,0]));
+    leads.forEach(l=>{ counts[l.status||'novo']++; });
+    const targets = leads.filter(l=>['nao','insta'].includes(siteState(l))).length;
+    const html = [
+      `<div class="kpi ${kpiFilter===''?'active':''}" data-k=""><b>${leads.length}</b><span>Lojas (${targets} alvos)</span></div>`,
+      ...['contatado','respondeu','proposta','fechado'].map(k=>{
+        const name = STATUSES.find(s=>s[0]===k)[1];
+        return `<div class="kpi ${kpiFilter===k?'active':''}" data-k="${k}"><b>${counts[k]}</b><span>${name}</span></div>`;
+      })
+    ].join('');
+    $('#kpis').innerHTML = html;
+    const total = leads.length, contacted = total - counts.novo;
+    $('#sub').textContent = total ? `${contacted} contatadas • ${counts.fechado} fechadas` : 'Comece importando lojas';
+  }
+
+  function renderFilters(){
+    const fill = (sel, key, label) => {
+      const cur = sel.value;
+      const vals = [...new Set(leads.map(l=>l[key]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+      sel.innerHTML = `<option value="">${label}</option>` + vals.map(v=>`<option>${esc(v)}</option>`).join('');
+      sel.value = vals.includes(cur) ? cur : '';
+    };
+    fill($('#fCity'),'city','Todas as cidades');
+    fill($('#fNiche'),'niche','Todos os nichos');
+  }
+
+  function cardHtml(l){
+    const st = siteState(l);
+    const tag = st==='nao' ? '<span class="tag nosite">Sem site</span>'
+      : st==='insta' ? '<span class="tag insta">Só Instagram</span>'
+      : st==='sim' ? '<span class="tag hassite">Tem site</span>'
+      : '<span class="tag">Site não verificado</span>';
+    const wa = waLink(l), ig = instaLink(l.instagram);
+    return `<article class="card st-${l.status||'novo'}" data-id="${l.id}">
+      <div><h3>${esc(l.name)}</h3>
+        <div class="meta">${tag}
+          ${l.niche?`<span class="tag">${esc(l.niche)}</span>`:''}
+          ${l.rating?`<span>⭐ ${esc(l.rating)}</span>`:''}
+          ${l.reviews?`<span>(${esc(l.reviews)} avaliações)</span>`:''}
+        </div>
+      </div>
+      ${l.address||l.city?`<div class="addr">${esc([l.address,l.city].filter(Boolean).join(' • '))}</div>`:''}
+      <div class="row">
+        ${wa?`<a class="btn wa" href="${wa}" target="_blank" rel="noopener" data-act="wa">WhatsApp</a>`:''}
+        ${l.phone?`<a class="btn" href="tel:${esc(String(l.phone).replace(/[^\d+]/g,''))}">Ligar</a>`:''}
+        ${ig?`<a class="btn" href="${esc(ig)}" target="_blank" rel="noopener">Instagram</a>`:''}
+        <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(l.name+' '+(l.city||''))}">Maps</a>
+      </div>
+      <div class="row">
+        <select data-f="status" aria-label="Status">${STATUSES.map(([k,n])=>`<option value="${k}" ${k===(l.status||'novo')?'selected':''}>${n}</option>`).join('')}</select>
+        <select data-f="siteStatus" aria-label="Tem site?">
+          <option value="desconhecido" ${st==='desconhecido'?'selected':''}>Site: não verificado</option>
+          <option value="nao" ${st==='nao'?'selected':''}>Site: não tem</option>
+          <option value="insta" ${st==='insta'?'selected':''}>Site: só Instagram</option>
+          <option value="sim" ${st==='sim'?'selected':''}>Site: já tem</option>
+        </select>
+      </div>
+      <textarea data-f="notes" placeholder="Anotações (valor combinado, retorno, dono…)">${esc(l.notes||'')}</textarea>
+      <div class="row">
+        <button class="btn sm" data-act="edit">Editar</button>
+        <button class="btn sm" data-act="del">Excluir</button>
+      </div>
+    </article>`;
+  }
+
+  function render(){
+    renderKpis(); renderFilters();
+    const r = filtered();
+    $('#count').textContent = leads.length ? `${r.length} de ${leads.length} lojas` : '';
+    if(!leads.length){
+      $('#list').innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Nenhuma loja ainda</b>Toque em <strong>Importar</strong> para colar um CSV, ou no <strong>+</strong> para adicionar uma loja manualmente.</div>`;
+    } else if(!r.length){
+      $('#list').innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Nada com esses filtros</b>Troque o filtro de site para “Todos” para ver tudo.</div>`;
+    } else {
+      $('#list').innerHTML = r.map(cardHtml).join('');
+    }
+  }
+
+  // ---------- CSV ----------
+  function parseCSV(text){
+    text = text.replace(/^﻿/,'');
+    const first = text.split(/\r?\n/,1)[0];
+    const delim = (first.match(/;/g)||[]).length > (first.match(/,/g)||[]).length ? ';' : (first.includes('\t')?'\t':',');
+    const rows=[]; let row=[], cur='', q=false;
+    for(let i=0;i<text.length;i++){
+      const c=text[i];
+      if(q){ if(c=='"'){ if(text[i+1]=='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+      else if(c=='"') q=true;
+      else if(c===delim){ row.push(cur); cur=''; }
+      else if(c=='\n'||c=='\r'){ if(c=='\r'&&text[i+1]=='\n') i++; row.push(cur); cur=''; if(row.some(x=>x.trim())) rows.push(row); row=[]; }
+      else cur+=c;
+    }
+    row.push(cur); if(row.some(x=>x.trim())) rows.push(row);
+    return rows;
+  }
+  const ALIASES = {
+    name:['name','nome','title','business name','empresa'],
+    phone:['phone','telefone','tel','celular','whatsapp','phone number'],
+    address:['address','endereco','endereço','full address'],
+    city:['city','cidade'],
+    niche:['niche','nicho','category','categoria','type','tipo'],
+    rating:['rating','nota','stars','reviewscore','review score'],
+    reviews:['reviews','avaliacoes','avaliações','reviews count','reviewscount','user ratings total'],
+    website:['website','site','url','web site','domain'],
+    instagram:['instagram','insta','ig']
+  };
+  function importCSV(text){
+    const rows = parseCSV(text);
+    if(rows.length<2) return toast('CSV vazio ou sem cabeçalho');
+    const head = rows[0].map(h=>norm(h).trim());
+    const idx = {};
+    for(const [k,al] of Object.entries(ALIASES)){
+      idx[k] = head.findIndex(h => al.map(norm).includes(h));
+    }
+    if(idx.name<0) return toast('Não achei a coluna "nome"/"name"');
+    const seen = new Set(leads.map(l=>norm(l.name)+'|'+String(l.phone||'').replace(/\D/g,'')));
+    let added=0, dup=0;
+    for(const r of rows.slice(1)){
+      const g = k => idx[k]>=0 ? (r[idx[k]]||'').trim() : '';
+      const name = g('name'); if(!name) continue;
+      const key = norm(name)+'|'+g('phone').replace(/\D/g,'');
+      if(seen.has(key)){ dup++; continue; }
+      seen.add(key);
+      const website = g('website'), instagram = g('instagram');
+      // Coluna de site presente: vazio = a ficha não lista site (alvo); preenchido = classifica pelo link.
+      // Sem a coluna no arquivo, não dá para saber: fica "não verificado".
+      let siteStatus = 'desconhecido';
+      if(idx.website>=0){
+        if(!website) siteStatus = instagram ? 'insta' : 'nao';
+        else siteStatus = /instagram|facebook|linktr|wa\.me|whatsapp|bio\.site/.test(norm(website)) ? 'insta' : 'sim';
+      }
+      leads.push({ id:uid(), name, phone:g('phone'), address:g('address'), city:g('city'), niche:g('niche'),
+        rating:g('rating'), reviews:g('reviews'), website, instagram,
+        siteStatus, status:'novo', notes:'', createdAt:Date.now() });
+      added++;
+    }
+    save(); render();
+    toast(`${added} importadas${dup?` • ${dup} repetidas ignoradas`:''}`);
+  }
+  function exportCSV(){
+    const cols = ['name','phone','address','city','niche','rating','reviews','website','instagram','siteStatus','status','notes'];
+    const q = v => '"'+String(v??'').replace(/"/g,'""')+'"';
+    const csv = [cols.join(',')].concat(leads.map(l=>cols.map(c=>q(l[c])).join(','))).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+    a.download = 'leads-sites-'+new Date().toISOString().slice(0,10)+'.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  // ---------- eventos ----------
+  $('#kpis').addEventListener('click', e=>{
+    const k = e.target.closest('.kpi'); if(!k) return;
+    kpiFilter = (kpiFilter===k.dataset.k) ? '' : k.dataset.k;
+    if(kpiFilter) $('#fSite').value='todos';
+    render();
+  });
+  ['#q','#fSite','#fCity','#fNiche','#fSort'].forEach(s=>$(s).addEventListener('input',render));
+
+  $('#list').addEventListener('change', e=>{
+    const el = e.target.closest('[data-f]'); if(!el) return;
+    const l = leads.find(x=>x.id===el.closest('.card').dataset.id); if(!l) return;
+    l[el.dataset.f] = el.value;
+    if(el.dataset.f==='siteStatus' && el.value!=='sim') {} // mantém website digitado
+    save(); render();
+  });
+  $('#list').addEventListener('click', e=>{
+    const b = e.target.closest('[data-act]'); if(!b) return;
+    const card = b.closest('.card'); const l = leads.find(x=>x.id===card.dataset.id); if(!l) return;
+    if(b.dataset.act==='wa'){
+      if((l.status||'novo')==='novo'){ l.status='contatado'; save(); setTimeout(render,400); }
+    } else if(b.dataset.act==='del'){
+      if(confirm('Excluir "'+l.name+'"?')){ leads = leads.filter(x=>x.id!==l.id); save(); render(); }
+    } else if(b.dataset.act==='edit'){ openEdit(l); }
+  });
+  // notas: salva ao sair do campo, sem re-renderizar
+  $('#list').addEventListener('focusout', e=>{
+    if(e.target.dataset.f!=='notes') return;
+    const l = leads.find(x=>x.id===e.target.closest('.card').dataset.id);
+    if(l && l.notes!==e.target.value){ l.notes=e.target.value; save(); }
+  });
+
+  document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));
+
+  $('#bImport').onclick = ()=> $('#dImport').showModal();
+  $('#csvFile').addEventListener('change', async e=>{ const f=e.target.files[0]; if(f) $('#csvText').value = await f.text(); });
+  $('#doImport').onclick = ()=>{ const t=$('#csvText').value.trim(); if(!t) return toast('Cole um CSV ou escolha um arquivo'); importCSV(t); $('#csvText').value=''; $('#dImport').close(); };
+  $('#bExport').onclick = ()=> leads.length ? exportCSV() : toast('Nada para exportar');
+  $('#bMsg').onclick = ()=>{ $('#msgText').value = msgTpl(); $('#dMsg').showModal(); };
+  $('#saveMsg').onclick = ()=>{ try{ localStorage.setItem(MSGKEY,$('#msgText').value); }catch{} $('#dMsg').close(); render(); toast('Modelo salvo'); };
+
+  let editing = null;
+  function openAdd(){ editing=null; $('#addTitle').textContent='Nova loja'; $('#fAdd').reset(); $('#dAdd').showModal(); }
+  function openEdit(l){
+    editing=l.id; $('#addTitle').textContent='Editar loja';
+    const f=$('#fAdd'); for(const el of f.elements){ if(el.name) el.value = (el.name==='siteStatus'?siteState(l):l[el.name])??''; }
+    $('#dAdd').showModal();
+  }
+  $('#bAdd').onclick = openAdd;
+  $('#fAdd').addEventListener('submit', e=>{
+    const f = e.target; const d = Object.fromEntries(new FormData(f));
+    if(!d.name.trim()) return;
+    if(editing){ Object.assign(leads.find(x=>x.id===editing), d); }
+    else leads.push({ id:uid(), status:'novo', notes:'', createdAt:Date.now(), ...d });
+    save(); render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
