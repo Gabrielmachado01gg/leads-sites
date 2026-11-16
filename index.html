@@ -58,6 +58,9 @@ h2.vt{font-size:20px;margin:2px 0 4px}
 .tag{background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:2px 9px;font-size:12px}
 .tag.nosite{border-color:var(--ok);color:var(--ok)}.tag.insta{border-color:var(--warn);color:var(--warn)}.tag.hassite{border-color:var(--bad);color:var(--bad)}
 .tag.money{border-color:var(--ok);color:var(--ok);font-weight:600}
+.tag.seen{border-color:#38bdf8;color:#38bdf8}
+.tk input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:8px}
+.tk .state{font-size:13px;margin-bottom:10px}
 .empty{text-align:center;color:var(--muted);padding:40px 16px;border:1px dashed var(--line);border-radius:var(--r)}
 .empty b{color:var(--text);display:block;font-size:17px;margin-bottom:6px}
 
@@ -214,6 +217,14 @@ dialog textarea{min-height:110px}
       <div class="panel"><h3>Vendas do mês</h3><div class="sales-list" id="salesList"></div></div>
       <div class="panel"><h3>O que é automático e o que é manual</h3>
         <div class="note" id="autoNote"></div>
+      </div>
+      <div class="panel tk"><h3>Rastreio automático da prévia</h3>
+        <div class="sub">Cada loja recebe um link próprio. Quando ela abre, o painel marca “Viu” sozinho.</div>
+        <div class="state" id="tkState"></div>
+        <input id="tkUrl" placeholder="Endereço do Worker (https://rastreio….workers.dev)" autocomplete="off">
+        <input id="tkToken" type="password" placeholder="Senha (TOKEN) do Worker" autocomplete="off">
+        <div class="toolbar"><button class="btn sm primary" id="tkSave">Salvar e testar</button><button class="btn sm" id="tkSync">Atualizar agora</button></div>
+        <div class="hint">Passo a passo da instalação na pasta “rastreio” do repositório (LEIA-ME).</div>
       </div>
       <div class="panel"><h3>Seus dados</h3><div class="sub">Tudo fica salvo neste aparelho. Para levar para outro, faça um backup.</div>
         <div class="toolbar"><button class="btn sm" id="bBackup">Baixar backup</button><button class="btn sm" id="bRestore">Restaurar backup</button><input type="file" id="fRestore" accept="application/json,.json" hidden></div>
@@ -406,7 +417,7 @@ dialog textarea{min-height:110px}
   const MAN_PRICE = 99.9;
   const DEFAULT_MSG = "Oi, tudo bem? Vi a {nome} no Google e reparei que vocês têm ótimas avaliações, mas ainda não têm um site. Montei um exemplo de como poderia ficar para {nicho} e queria te mostrar, sem compromisso. Posso enviar por aqui?";
   const K = { leads:'leadsSites.v1', msg:'leadsSites.msg', dis:'leadsSites.dismissed', tpl:'leadsSites.tpls',
-              contract:'leadsSites.contract', me:'leadsSites.me', steps:'leadsSites.steps', meta:'leadsSites.meta' };
+              contract:'leadsSites.contract', me:'leadsSites.me', steps:'leadsSites.steps', meta:'leadsSites.meta', track:'leadsSites.track' };
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
   const jget = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
@@ -571,6 +582,7 @@ dialog textarea{min-height:110px}
           ${l.niche?`<span class="tag">${esc(l.niche)}</span>`:''}
           ${l.rating?`<span>⭐ ${esc(l.rating)}</span>`:''}
           ${l.reviews?`<span>(${esc(l.reviews)} avaliações)</span>`:''}
+          ${l.views?`<span class="tag seen">👀 viu ${l.views}x • ${new Date(l.lastView).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>`:''}
           ${cur==='fechado'?`<span class="tag money">${l.valor?brl(l.valor):'sem valor'}${l.manut?' + manutenção':''}</span>`:''}
         </div>
       </div>
@@ -581,6 +593,7 @@ dialog textarea{min-height:110px}
         ${ig?`<a class="btn" href="${esc(ig)}" target="_blank" rel="noopener">Instagram</a>`:''}
         <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(l.name+' '+(l.city||''))}">Maps</a>
       </div>
+      ${trackOn()?`<div class="row"><button class="btn sm" data-act="link">${l.trackUrl?'🔗 Copiar link da prévia':'🔗 Gerar link da prévia'}</button>${l.trackUrl?'<button class="btn sm" data-act="relink">Trocar prévia</button>':''}</div>`:''}
       ${next?`<div class="next">${next}</div>`:''}
       <div class="row">
         <select data-f="status" aria-label="Etapa">${STATUSES.map(([k,n])=>`<option value="${k}" ${k===cur?'selected':''}>${n}</option>`).join('')}</select>
@@ -688,7 +701,7 @@ dialog textarea{min-height:110px}
       { id:'a3', t:'Elogio e prova', w:'Parte do que os clientes dizem.', x:"Oi! Aqui é o Gabriel. Li as avaliações da {nome} e fiquei impressionado com o que os clientes falam do atendimento. Isso é ouro, e hoje só aparece no Google.\n\nUm site próprio colocaria tudo isso na frente de quem ainda não conhece vocês, com os serviços, as avaliações e o botão de agendar no WhatsApp. É o que costuma transformar quem só está pesquisando em cliente.\n\nFiz uma prévia pensando na {nome}. Quer ver? Leva um minuto." }
     ]},
     { g:'Prévia e retorno', items:[
-      { id:'p1', t:'Enviando a prévia', w:'Mande junto com a imagem do topo da prévia.', x:"Aqui está a prévia que fiz para a {nome} 👇\n\nÉ um exemplo de como o site poderia ficar, com as informações e as avaliações do Google de vocês. Os textos e as fotos finais a gente ajusta juntos. O que achou?" },
+      { id:'p1', t:'Enviando a prévia', w:'Mande junto com a imagem do topo da prévia.', x:"Aqui está a prévia que fiz para a {nome} 👇\n{link}\n\nÉ um exemplo de como o site poderia ficar, com as informações e as avaliações do Google de vocês. Os textos e as fotos finais a gente ajusta juntos. O que achou?" },
       { id:'f1', t:'Retorno depois de 2 dias', w:'Se visualizou e não respondeu.', x:"Oi! Passando só para saber se você chegou a ver a prévia do site da {nome}. Se tiver qualquer dúvida sobre como funciona, é só falar." },
       { id:'f2', t:'Último retorno', w:'Educado, sem pressão. Fecha o ciclo.', x:"Oi, tudo bem? Não quero te incomodar, então deixo a prévia aqui caso faça sentido mais para frente. Se quiser que eu ajuste ou explique como funciona, é só me chamar. Obrigado pela atenção!" }
     ]},
@@ -712,7 +725,8 @@ dialog textarea{min-height:110px}
   function tplText(it){ return tplStore()[it.id] ?? it.x; }
   function fillVars(text, l){
     const nome = l ? l.name : '[nome da loja]', nicho = l ? (l.niche || 'o seu negócio') : '[nicho]';
-    return text.replaceAll('{nome}', nome).replaceAll('{nicho}', nicho);
+    const link = l && l.trackUrl ? l.trackUrl : '[link da prévia]';
+    return text.replaceAll('{nome}', nome).replaceAll('{nicho}', nicho).replaceAll('{link}', link);
   }
   function bubbleHtml(text){ return esc(text).replace(/\[[^\]]+\]/g, m => `<mark>${m}</mark>`); }
   function mLead(){ const id = $('#mLead').value; return leads.find(l=>l.id===id) || null; }
@@ -994,10 +1008,52 @@ dialog textarea{min-height:110px}
     } catch {}
   }
 
+  // ---------- rastreio automático (Cloudflare Worker) ----------
+  const getTrack = () => jget(K.track, {});
+  const trackOn = () => { const t = getTrack(); return !!(t.url && t.token); };
+  async function api(path, opts = {}){
+    const t = getTrack();
+    const r = await fetch(t.url.replace(/\/+$/,'') + path, { ...opts, headers: { Authorization:'Bearer '+t.token, 'Content-Type':'application/json' } });
+    if(!r.ok){ let m = r.status; try { m = (await r.json()).error || m; } catch {} throw new Error(m); }
+    return r.json();
+  }
+  async function syncViews(silent){
+    if(!trackOn()) return;
+    try {
+      const v = await api('/api/views'); let marked = 0;
+      leads.forEach(l => {
+        const arr = l.trackSlug && v[l.trackSlug]; if(!arr || !arr.length) return;
+        l.views = arr.length; l.lastView = arr[arr.length-1].t;
+        if(['novo','contatado'].includes(l.status||'novo')){ setStatus(l,'visualizou'); marked++; }
+      });
+      save(); render();
+      if(marked) toast(marked===1 ? '1 loja abriu a prévia 👀' : marked+' lojas abriram a prévia 👀');
+      else if(!silent) toast('Visualizações atualizadas');
+    } catch(e){ if(!silent) toast('Não consegui falar com o rastreio: '+e.message); }
+  }
+  async function makeLink(l, askUrl){
+    let dest = l.previewUrl || '';
+    if(askUrl || !dest){
+      dest = (prompt('Cole o endereço da prévia desta loja (começa com https://):', dest) || '').trim();
+      if(!dest) return;
+    }
+    const slug = l.trackSlug || Array.from(crypto.getRandomValues(new Uint8Array(10)), b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
+    try {
+      await api('/api/links', { method:'POST', body: JSON.stringify({ slug, url: dest }) });
+      l.previewUrl = dest; l.trackSlug = slug; l.trackUrl = getTrack().url.replace(/\/+$/,'') + '/p/' + slug;
+      save(); render(); copyText(l.trackUrl, 'Link copiado. Cole na mensagem do WhatsApp');
+    } catch(e){ toast('Não consegui criar o link: '+e.message); }
+  }
+  function renderTrackPanel(){
+    const t = getTrack(); $('#tkUrl').value = t.url || ''; $('#tkToken').value = t.token || '';
+    const n = leads.filter(l=>l.trackSlug).length, v = leads.filter(l=>l.views).length;
+    $('#tkState').innerHTML = trackOn() ? `<span class="tag nosite">Ligado</span> ${n} links criados • ${v} abertos` : '<span class="tag">Desligado</span> Preencha os dois campos abaixo depois de instalar o Worker.';
+  }
+
   // ---------- render central ----------
   function renderView(v){
     renderSub();
-    if(v==='painel') renderPainel();
+    if(v==='painel'){ renderPainel(); renderTrackPanel(); }
     else if(v==='leads') renderLeads();
     else if(v==='msgs'){ renderMsgOptions(); renderMsgs(); }
     else if(v==='contrato'){ loadContractForm(); renderContrato(); }
@@ -1026,6 +1082,8 @@ dialog textarea{min-height:110px}
     if(a==='wa'){ if((l.status||'novo')==='novo'){ setStatus(l,'contatado'); save(); setTimeout(render,400); } }
     else if(a==='go'){ changeStatus(l, b.dataset.s); }
     else if(a==='sale'){ askSale(l); }
+    else if(a==='link'){ l.trackUrl ? copyText(l.trackUrl, 'Link copiado. Cole na mensagem do WhatsApp') : makeLink(l, false); }
+    else if(a==='relink'){ makeLink(l, true); }
     else if(a==='del'){ if(confirm('Excluir "'+l.name+'"?')){ dismiss(l); leads = leads.filter(x=>x.id!==l.id); save(); render(); } }
     else if(a==='edit'){ openEdit(l); }
   });
@@ -1077,6 +1135,15 @@ dialog textarea{min-height:110px}
     kpiFilter = ''; $('#q').value = l.name; $('#fSite').value = 'todos'; $('#fCity').value=''; $('#fNiche').value='';
     show('leads');
   });
+  $('#tkSave').onclick = async ()=>{
+    const url = $('#tkUrl').value.trim(), token = $('#tkToken').value.trim();
+    if(!/^https:\/\//i.test(url) || !token) return toast('Preencha o endereço (https://…) e a senha');
+    jset(K.track, { url, token });
+    try { await api('/api/ping'); toast('Conectado ✔'); renderTrackPanel(); syncViews(true); }
+    catch(e){ toast('Não conectou: '+(e.message==='401'||e.message==='unauthorized'?'senha incorreta':'confira o endereço')); renderTrackPanel(); }
+  };
+  $('#tkSync').onclick = ()=> trackOn() ? syncViews(false) : toast('Configure o rastreio primeiro');
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) syncViews(true); });
   $('#bBackup').onclick = ()=>{
     const data = {}; for(let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if(k.startsWith('leadsSites.')) data[k] = localStorage.getItem(k); }
     const a = document.createElement('a');
@@ -1139,6 +1206,7 @@ dialog textarea{min-height:110px}
   // ---------- início ----------
   show(location.hash.slice(1) || 'painel', false);
   loadSeed();
+  syncViews(true);
 })();
 </script>
 </body>
