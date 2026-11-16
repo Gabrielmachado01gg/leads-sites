@@ -706,7 +706,7 @@ dialog textarea{min-height:110px}
       { id:'f2', t:'Último retorno', w:'Educado, sem pressão. Fecha o ciclo.', x:"Oi, tudo bem? Não quero te incomodar, então deixo a prévia aqui caso faça sentido mais para frente. Se quiser que eu ajuste ou explique como funciona, é só me chamar. Obrigado pela atenção!" }
     ]},
     { g:'Proposta e contrato', items:[
-      { id:'r1', t:'Resumo da proposta', w:'Troque [valor] e [X] antes de enviar.', x:"Combinado! Resumo da proposta para a {nome}:\n\n• Site profissional, adaptado para celular e computador\n• Botões de WhatsApp, ligação e mapa\n• Seções com serviços, avaliações e localização\n• 2 rodadas de ajustes\n• Publicação no domínio da {nome}\n\nValor: [valor], sendo 50% para começar e 50% na entrega.\nPrazo: [X] dias úteis depois da entrada e do envio do material.\n\nOpcionalmente, manutenção mensal de R$ 99,90, com até 2 alterações por mês. Posso te mandar o contrato para assinar pelo gov.br?" },
+      { id:'r1', t:'Resumo da proposta', w:'Troque [valor] e [X] antes de enviar.', x:"Combinado! Resumo da proposta para a {nome}:\n\n• Site profissional, adaptado para celular e computador\n• Botões de WhatsApp, ligação e mapa\n• Seções com serviços, avaliações e localização\n• 2 rodadas de ajustes\n• Publicação no domínio da {nome}\n\nValor: [valor], sendo 50% para começar e 50% na entrega.\nPrazo: [X] dias úteis depois da entrada e do envio do material.\n\nOpcionalmente, manutenção mensal de R$ 99,90, com até 5 alterações por mês. Posso te mandar o contrato para assinar pelo gov.br?" },
       { id:'c1', t:'Enviando o contrato', w:'Anexe o PDF gerado na aba Contrato.', x:"Segue o contrato para assinatura (pelo gov.br ou com um “li e aceito” por aqui). Assim os dois ficam protegidos e o combinado fica registrado. Qualquer dúvida em alguma cláusula, me pergunte." },
       { id:'c2', t:'Cobrança da entrada', w:'Boleto com Pix emitido pelo Inter.', x:"Obrigado pela confiança! Segue o boleto com Pix da entrada (50%): [link ou código]. Assim que compensar, começo a montar o site.\n\nPreciso do logo, das fotos e das informações (serviços, horários, endereço). Pode me mandar por aqui?" },
       { id:'c3', t:'Cobrança final', w:'Quando o site estiver aprovado.', x:"O site da {nome} está pronto para a última revisão: [link]. Estando tudo certo, segue o boleto com Pix dos 50% restantes: [link ou código]. Assim que compensar, publico no domínio de vocês." }
@@ -789,24 +789,25 @@ dialog textarea{min-height:110px}
       `CONTRATANTE: ${v(f.cliente,'NOME OU RAZÃO SOCIAL DO CLIENTE')}, CPF/CNPJ ${v(f.doc,'número')}, com endereço em ${v(f.endCli,'endereço completo')}, representado(a) por ${v(f.repr,'nome do responsável')}, e-mail ${v(f.emailCli,'e-mail')}, WhatsApp ${v(f.zapCli,'número')}. Doravante "Contratante".`,
       'As partes combinam o que segue.']]);
     C.push(['2. Objeto e escopo',[
-      '2.1. O Contratado vai criar e publicar o site do Contratante, com design próprio, adaptado para celular e computador.',
-      '2.2. Estão incluídos no valor deste contrato:',
+      '2.1. Antes de começar, o Contratante e o Contratado conversam e combinam tudo o que a loja quer fazer e ter no site, dentro dos limites do nível Simples, Intermediário ou Avançado descritos na cláusula 3.1. Esse combinado fica registrado por escrito (mensagem de WhatsApp vale) e passa a ser o escopo deste contrato.',
+      '2.2. O Contratado vai criar e publicar o site do Contratante, com design próprio, adaptado para celular e computador.',
+      '2.3. Estão incluídos no valor deste contrato:',
       '- Projeto visual (layout, cores e fontes) alinhado com a identidade do Contratante.',
       `- Páginas ou seções, conforme combinado: ${v(f.escopo,'liste, por exemplo: início, serviços, avaliações, localização e contato')}.`,
       '- Botões de contato por WhatsApp, telefone e link para o Google Maps.',
       '- Mapa ou endereço, horário de funcionamento e dados de contato informados pelo Contratante.',
       '- Configuração básica para o site aparecer corretamente nas buscas (título, descrição e velocidade).',
       '- Publicação do site no domínio e na hospedagem do Contratante, e orientação de como usá-los.',
-      '2.3. Qualquer item fora desta lista é considerado extra, conforme a cláusula 5.']]);
+      '2.4. Qualquer item fora desta lista é considerado extra, conforme a cláusula 5.']]);
     C.push(['3. Preço e pagamento',[
       '3.1. O valor do site é definido conforme a complexidade do trabalho, dentro destas faixas de referência:',
       '- Simples (página única, até 5 seções, botões de contato): R$ 800 a R$ 1.200.',
       '- Intermediário (várias páginas, formulário de contato, galeria, textos mais elaborados): R$ 1.200 a R$ 1.800.',
       '- Avançado (muitas páginas, animações, mais de um idioma ou design totalmente personalizado): R$ 1.800 a R$ 2.200.',
-      `3.2. Para este contrato, o valor total fechado é de ${total}, já considerando o escopo da cláusula 2.`,
+      `3.2. Depois de combinado tudo o que o site terá (cláusula 2.1), o Contratado prepara este contrato e envia ao Contratante com o valor final. Para este contrato, o valor total fechado é de ${total}, já considerando o escopo combinado.`,
       '3.3. O pagamento é feito por boleto bancário com Pix ou por QR Code Pix, emitido pelo Contratado em nome do CNPJ indicado na cláusula 1, em duas partes:',
-      `- 50% de entrada (${halfTxt}), até ${v(f.dEntrada,'data')}, para o início do trabalho.`,
-      `- 50% na entrega (${halfTxt}), até ${v(f.dEntrega,'data ou "no dia da aprovação"')}, antes da publicação final do site.`,
+      `- 50% de entrada (${halfTxt}), até ${v(f.dEntrada,'data')}, depois da assinatura do contrato e antes do início do trabalho.`,
+      `- 50% na entrega (${halfTxt}), até ${v(f.dEntrega,'data ou "no dia da aprovação"')}, depois de o Contratante aprovar o site pronto e antes da publicação final.`,
       '3.4. Em caso de atraso no pagamento, incidem multa de 2% sobre o valor em atraso e juros de 1% ao mês.',
       '3.5. A entrada não é devolvida pelo trabalho já realizado, salvo se o Contratado não entregar o site por motivo seu.']]);
     C.push(['4. Prazo, revisões e conteúdo do cliente',[
@@ -840,7 +841,7 @@ dialog textarea{min-height:110px}
     C.push(['8. Manutenção mensal (opcional)',[
       `8.1. Depois da entrega, o Contratante pode contratar a manutenção mensal por R$ 99,90 por mês, paga por boleto com Pix emitido pelo Contratado, até o dia ${v(f.diaManut,'dia')} de cada mês. Marque aqui: ${man}.`,
       '8.2. A manutenção inclui:',
-      '- Até 2 pequenas alterações por mês, como trocar textos, horários, fotos ou links.',
+      '- Até 5 pequenas alterações por mês, como trocar textos, horários, fotos ou links.',
       '- Correção de erros e de links que parem de funcionar.',
       '- Suporte por WhatsApp em dias úteis.',
       '8.3. Não estão incluídos na manutenção: páginas novas, mudança de layout e qualquer item da cláusula 5. Esses serviços são orçados à parte.',
@@ -896,13 +897,14 @@ dialog textarea{min-height:110px}
       { id:'c1', t:'Escolher a loja alvo', d:'Filtre por “Sem site” e comece pelas com mais avaliações. Confira na ficha do Maps se ainda não tem site.', go:['leads','Ir para Leads'] },
       { id:'c2', t:'Mandar a primeira mensagem', d:'Use “Pergunta curiosa” ou “Cliente que pesquisa”. Ao tocar em WhatsApp, a loja vira Contatado.', go:['msgs','Ver mensagens'] },
       { id:'c3', t:'Enviar a prévia', d:'Mande a imagem do topo do site de exemplo. Marque “Viu” se os tiques ficarem azuis no WhatsApp Business, e “Respondeu” quando ela responder.' },
+      { id:'c3b', t:'Combinar o que a loja quer no site', d:'Converse e anote tudo o que ela quer fazer e ter no site, dentro dos limites do Simples, Intermediário ou Avançado do contrato. Só depois de combinado você prepara o contrato e o valor.' },
       { id:'c4', t:'Mandar a proposta', d:'Escolha o valor na faixa de R$ 800 a R$ 2.200 conforme o trabalho. Marque “Enviei proposta”.', go:['msgs','Resumo da proposta'] },
-      { id:'c5', t:'Preencher e enviar o contrato', d:'Preencha os dados do cliente, salve em PDF e assine pelo gov.br.', go:['contrato','Abrir contrato'] },
+      { id:'c5', t:'Preencher e enviar o contrato', d:'Com o escopo combinado, preencha os dados e o valor do cliente, salve em PDF e assine pelo gov.br.', go:['contrato','Abrir contrato'] },
       { id:'c6', t:'Cobrar a entrada de 50%', d:'Boleto com Pix pelo Inter. Só comece o trabalho depois de compensar. Marque “Fechou” e informe o valor: ele entra no gráfico.' },
       { id:'c7', t:'Receber o material e construir', d:'Logo, fotos, serviços, horários e endereço. Respeite o prazo do contrato.' },
       { id:'c8', t:'Rodadas de ajuste (até 2)', d:'Peça para o cliente mandar todos os ajustes de uma vez, por rodada.' },
       { id:'c9', t:'Cobrar os 50% finais e publicar', d:'Domínio e hospedagem no nome do cliente, em um plano que permita uso comercial.' },
-      { id:'c10', t:'Oferecer a manutenção e pedir indicação', d:'R$ 99,90 por mês. Marque “com manutenção” na venda para somar na recorrência.', go:['msgs','Mensagens de entrega'] }
+      { id:'c10', t:'Oferecer a manutenção e pedir indicação', d:'R$ 99,90 por mês, com até 5 alterações por mês. Marque “com manutenção” na venda para somar na recorrência.', go:['msgs','Mensagens de entrega'] }
     ]}
   ];
   function renderSteps(){
