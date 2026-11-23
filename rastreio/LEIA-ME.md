@@ -38,3 +38,10 @@ Na tela do Worker aparece o endereço, algo como `https://rastreio.SEU-NOME.work
 - Guarda só o horário e se foi no celular. Não guarda IP nem nome.
 - Se a pessoa abrir o link por outro aparelho, ou encaminhar a mensagem, conta como outra abertura.
 - Não diz se leu a mensagem, só se abriu o link da prévia. Responder continua sendo um toque manual.
+
+## Novidades: prévias geradas e "minhas visitas"
+
+- **Criar prévia**: no cartão da loja, o botão "Criar prévia" monta um site de exemplo com os dados do Maps/Instagram. "Gerar link e copiar" envia o HTML ao Worker (`POST /api/previews`), que o serve em `/s/<código>` (com noindex) e já cria o link rastreado.
+- **Ignorar minhas visitas**: abra `<seu-worker>/eu` uma vez em cada aparelho seu (celular e computador). Isso grava o cookie `rastreio_eu` e suas visitas deixam de contar.
+- Visitas só contam depois que a loja foi contatada. O botão "Não foi ela que viu" zera as visualizações de uma loja.
+- Depois de atualizar o `worker.js`, faça o deploy de novo no Cloudflare (Workers → rastreio → Edit code → Deploy).

@@ -21,6 +21,10 @@ export default {
 
     const p = url.pathname;
     if (p.startsWith('/p/')) return visit(req, env, p.slice(3));
+    if (p.startsWith('/s/')) return site(env, p.slice(3));
+    if (p === '/eu') return new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Pronto</title><body style="font-family:system-ui;padding:28px;line-height:1.5"><h2>Pronto ✅</h2><p>Este aparelho não conta mais como visita nas suas prévias.</p>',
+      { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store',
+        'set-cookie': 'rastreio_eu=1; Max-Age=31536000; Path=/; Secure; HttpOnly; SameSite=Lax' } });
 
     if (p.startsWith('/api/')) {
       if (!env.TOKEN || req.headers.get('Authorization') !== 'Bearer ' + env.TOKEN) return json({ error: 'unauthorized' }, 401, cors);
@@ -33,6 +37,15 @@ export default {
         if (!/^[a-z0-9]{6,16}$/.test(slug)) return json({ error: 'slug inválido' }, 400, cors);
         if (!/^https:\/\//i.test(target)) return json({ error: 'o endereço da prévia precisa começar com https://' }, 400, cors);
         await env.VIEWS.put('link:' + slug, JSON.stringify({ url: target }));
+        return json({ ok: true }, 200, cors);
+      }
+
+      if (p === '/api/previews' && req.method === 'POST') {
+        let body; try { body = await req.json(); } catch { return json({ error: 'json inválido' }, 400, cors); }
+        const slug = String(body.slug || ''), html = String(body.html || '');
+        if (!/^[a-z0-9]{6,16}$/.test(slug)) return json({ error: 'slug inválido' }, 400, cors);
+        if (!html || html.length > 600000) return json({ error: 'prévia vazia ou grande demais' }, 400, cors);
+        await env.VIEWS.put('site:' + slug, html);
         return json({ ok: true }, 200, cors);
       }
 
@@ -51,6 +64,9 @@ async function visit(req, env, slug) {
   const rec = await env.VIEWS.get('link:' + slug, 'json');
   if (!rec) return new Response('Link não encontrado.', { status: 404 });
   const ua = req.headers.get('User-Agent') || '';
+  // Aparelhos marcados em /eu (os seus) abrem a prévia sem contar visita.
+  if ((req.headers.get('Cookie') || '').includes('rastreio_eu=1'))
+    return new Response(null, { status: 302, headers: { Location: rec.url, 'cache-control': 'no-store' } });
 
   if (BOT.test(ua) || req.method === 'HEAD') {
     // Cartão simples para a pré-visualização do link no WhatsApp, sem contar visita.
@@ -67,4 +83,11 @@ async function visit(req, env, slug) {
     await env.VIEWS.put(key, JSON.stringify(arr.slice(-50)));
   }
   return new Response(null, { status: 302, headers: { Location: rec.url, 'cache-control': 'no-store' } });
+}
+
+// Prévias geradas pelo painel (HTML guardado no KV). Não aparecem em buscadores.
+async function site(env, slug) {
+  const html = await env.VIEWS.get('site:' + slug);
+  if (!html) return new Response('Prévia não encontrada.', { status: 404 });
+  return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'x-robots-tag': 'noindex, nofollow', 'cache-control': 'no-store' } });
 }

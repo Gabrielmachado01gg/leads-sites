@@ -59,6 +59,12 @@ h2.vt{font-size:20px;margin:2px 0 4px}
 .tag.nosite{border-color:var(--ok);color:var(--ok)}.tag.insta{border-color:var(--warn);color:var(--warn)}.tag.hassite{border-color:var(--bad);color:var(--bad)}
 .tag.money{border-color:var(--ok);color:var(--ok);font-weight:600}
 .tag.seen{border-color:#38bdf8;color:#38bdf8}
+.linkbtn{background:none;border:0;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:inherit;padding:0 0 0 6px}
+#dPrev{width:min(1040px,96vw)}
+.pgrid{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:860px){.pgrid{grid-template-columns:340px 1fr}}
+#prevFrame{width:100%;height:62vh;min-height:380px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.pform .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .tk input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:8px}
 .tk .state{font-size:13px;margin-bottom:10px}
 .empty{text-align:center;color:var(--muted);padding:40px 16px;border:1px dashed var(--line);border-radius:var(--r)}
@@ -223,8 +229,8 @@ dialog textarea{min-height:110px}
         <div class="state" id="tkState"></div>
         <input id="tkUrl" placeholder="Endereço do Worker (https://rastreio….workers.dev)" autocomplete="off">
         <input id="tkToken" type="password" placeholder="Senha (TOKEN) do Worker" autocomplete="off">
-        <div class="toolbar"><button class="btn sm primary" id="tkSave">Salvar e testar</button><button class="btn sm" id="tkSync">Atualizar agora</button></div>
-        <div class="hint">Passo a passo da instalação na pasta “rastreio” do repositório (LEIA-ME).</div>
+        <div class="toolbar"><button class="btn sm primary" id="tkSave">Salvar e testar</button><button class="btn sm" id="tkSync">Atualizar agora</button><button class="btn sm" id="tkMine">Ignorar minhas visitas neste aparelho</button></div>
+        <div class="hint">Abra “Ignorar minhas visitas” uma vez em cada aparelho seu (celular e computador), para os seus testes não contarem. Passo a passo da instalação na pasta “rastreio” do repositório.</div>
       </div>
       <div class="panel"><h3>Seus dados</h3><div class="sub">Tudo fica salvo neste aparelho. Para levar para outro, faça um backup.</div>
         <div class="toolbar"><button class="btn sm" id="bBackup">Baixar backup</button><button class="btn sm" id="bRestore">Restaurar backup</button><input type="file" id="fRestore" accept="application/json,.json" hidden></div>
@@ -400,6 +406,32 @@ dialog textarea{min-height:110px}
   </form>
 </dialog>
 
+<!-- Criar prévia -->
+<dialog id="dPrev">
+  <h2 id="prevTitle">Criar prévia</h2>
+  <div class="hint">Os dados vêm do cadastro da loja (Maps e Instagram). Ajuste o que quiser: a prévia ao lado atualiza sozinha.</div>
+  <div class="pgrid">
+    <div class="pform">
+      <label>Nome</label><input data-p="name">
+      <label>Tipo de negócio</label><input data-p="niche">
+      <label>Frase de destaque (em branco usa uma sugestão)</label><input data-p="tagline">
+      <label>Serviços, separados por vírgula (opcional)</label><textarea data-p="services" rows="2" placeholder="ex.: Limpeza de pele, Massagem, Depilação"></textarea>
+      <label>Cidade</label><input data-p="city">
+      <label>Endereço</label><input data-p="address">
+      <label>Telefone / WhatsApp</label><input data-p="phone" inputmode="tel">
+      <label>Instagram</label><input data-p="instagram">
+      <div class="two"><div><label>Nota no Google</label><input data-p="rating" inputmode="decimal"></div><div><label>Avaliações</label><input data-p="reviews" inputmode="numeric"></div></div>
+      <label>Visual</label><select data-p="theme"></select>
+    </div>
+    <iframe id="prevFrame" title="Prévia do site" sandbox></iframe>
+  </div>
+  <div class="actions">
+    <button type="button" class="btn" data-close>Fechar</button>
+    <button type="button" class="btn" id="prevAsk">Pedir versão completa ao Claude</button>
+    <button type="button" class="btn primary" id="prevGo">Gerar link e copiar</button>
+  </div>
+</dialog>
+
 <script>
 (() => {
   // ---------- dados base ----------
@@ -423,7 +455,7 @@ dialog textarea{min-height:110px}
   const jget = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
   const jset = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { toast('Não consegui salvar neste navegador'); } };
   let leads = jget(K.leads, []);
-  let kpiFilter = '';
+  let kpiFilter = 'novo';
 
   function save(){ jset(K.leads, leads); }
   function msgTpl(){ try { return localStorage.getItem(K.msg) || DEFAULT_MSG; } catch { return DEFAULT_MSG; } }
@@ -545,11 +577,9 @@ dialog textarea{min-height:110px}
   function renderKpis(){
     const counts = Object.fromEntries(STATUSES.map(([k])=>[k,0]));
     leads.forEach(l=>{ counts[l.status||'novo']++; });
-    const targets = leads.filter(l=>['nao','insta'].includes(siteState(l))).length;
     $('#kpis').innerHTML = [
-      `<div class="kpi ${kpiFilter===''?'active':''}" data-k=""><b>${leads.length}</b><span>Lojas (${targets} alvos)</span></div>`,
-      ...['contatado','visualizou','respondeu','proposta','fechado'].map(k=>{
-        const name = STATUSES.find(s=>s[0]===k)[1];
+      ...['novo','contatado','visualizou','respondeu','proposta','fechado'].map(k=>{
+        const name = k==='novo' ? 'Para contatar' : STATUSES.find(s=>s[0]===k)[1];
         return `<div class="kpi ${kpiFilter===k?'active':''}" data-k="${k}"><b>${counts[k]}</b><span>${name}</span></div>`;
       })
     ].join('');
@@ -593,7 +623,7 @@ dialog textarea{min-height:110px}
         ${ig?`<a class="btn" href="${esc(ig)}" target="_blank" rel="noopener">Instagram</a>`:''}
         <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(l.name+' '+(l.city||''))}">Maps</a>
       </div>
-      ${trackOn()?`<div class="row"><button class="btn sm" data-act="link">${l.trackUrl?'🔗 Copiar link da prévia':'🔗 Gerar link da prévia'}</button>${l.trackUrl?'<button class="btn sm" data-act="relink">Trocar prévia</button>':''}</div>`:''}
+      <div class="row"><button class="btn sm" data-act="prev">✨ ${l.previewData?'Editar prévia':'Criar prévia'}</button>${trackOn()?`<button class="btn sm" data-act="link">${l.trackUrl?'🔗 Copiar link da prévia':'🔗 Link de outra prévia'}</button>${l.trackUrl?'<button class="btn sm" data-act="relink">Trocar prévia</button>':''}`:''}${l.views?'<button class="btn sm" data-act="noview">Não foi ela que viu</button>':''}</div>
       ${next?`<div class="next">${next}</div>`:''}
       <div class="row">
         <select data-f="status" aria-label="Etapa">${STATUSES.map(([k,n])=>`<option value="${k}" ${k===cur?'selected':''}>${n}</option>`).join('')}</select>
@@ -615,11 +645,14 @@ dialog textarea{min-height:110px}
   function renderLeads(){
     renderKpis(); renderFilters();
     const r = filtered();
-    $('#count').textContent = leads.length ? `${r.length} de ${leads.length} lojas` : '';
+    const nm = kpiFilter ? (kpiFilter==='novo' ? 'Para contatar' : STATUSES.find(s=>s[0]===kpiFilter)[1]) : 'Todas';
+    $('#count').innerHTML = leads.length ? `${r.length} em “${esc(nm)}” • ${leads.length} no total${kpiFilter?'<button class="linkbtn" data-all>ver todas</button>':''}` : '';
     if(!leads.length){
       $('#list').innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Nenhuma loja ainda</b>Toque em <strong>Importar CSV</strong> ou no <strong>+</strong> para adicionar uma loja.</div>`;
     } else if(!r.length){
-      $('#list').innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Nada com esses filtros</b>Troque o filtro de site para “Todos” para ver tudo.</div>`;
+      $('#list').innerHTML = kpiFilter==='novo'
+        ? `<div class="empty" style="grid-column:1/-1"><b>Nenhuma loja nova para contatar</b>As que você já chamou no WhatsApp estão nos quadros Contatado, Visualizou, Respondeu… acima. Toque em “ver todas” para listar tudo.</div>`
+        : `<div class="empty" style="grid-column:1/-1"><b>Nada com esses filtros</b>Troque o filtro de site para “Todos” ou toque em “ver todas”.</div>`;
     } else {
       $('#list').innerHTML = r.map(cardHtml).join('');
     }
@@ -711,6 +744,11 @@ dialog textarea{min-height:110px}
       { id:'c2', t:'Cobrança da entrada', w:'Boleto com Pix emitido pelo Inter.', x:"Obrigado pela confiança! Segue o boleto com Pix da entrada (50%): [link ou código]. Assim que compensar, começo a montar o site.\n\nPreciso do logo, das fotos e das informações (serviços, horários, endereço). Pode me mandar por aqui?" },
       { id:'c3', t:'Cobrança final', w:'Quando o site estiver aprovado.', x:"O site da {nome} está pronto para a última revisão: [link]. Estando tudo certo, segue o boleto com Pix dos 50% restantes: [link ou código]. Assim que compensar, publico no domínio de vocês." }
     ]},
+    { g:'Contrato pelo WhatsApp (aceite por mensagem)', items:[
+      { id:'k1', t:'Resumo do contrato + aceite', w:'Anexe o PDF do contrato. Preencha valor e prazo na aba Contrato.', x:"Oi! Segue o resumo do contrato do site da {nome}:\n\n• Valor: {valor}, em 2 parcelas: 50% de entrada ({entrada}) e 50% na entrega, depois de você aprovar o site pronto\n• Prazo: {prazo} dias úteis, contados do pagamento da entrada e do recebimento do material\n• Inclui: tudo o que combinamos para o site, 2 rodadas de ajustes e a publicação no seu domínio\n• Fica de fora (orçado à parte): pagamento online, sistemas com login e o que não estiver no combinado\n• Domínio e hospedagem ficam no seu nome, com custo seu\n• Manutenção opcional: R$ 99,90 por mês, com até 5 alterações por mês\n\nO contrato completo está no PDF em anexo. Para aceitar, é só responder aqui: “Li e aceito o contrato”. Essa resposta, com data e hora, fica registrada como o seu aceite.\n\nDepois do aceite, eu te envio o boleto com Pix da entrada." },
+      { id:'k2', t:'Contrato completo no chat + aceite', w:'Para quem não quer abrir PDF. A mensagem é longa.', x:"Oi! Segue o contrato completo do site da {nome}, direto aqui no chat:\n\n{contrato}\n\nPara aceitar, é só responder: “Li e aceito o contrato”. Essa resposta, com data e hora, fica registrada como o seu aceite." },
+      { id:'k3', t:'Confirmando o aceite', w:'Logo depois que ela responder “Li e aceito”.', x:"Recebi o seu aceite, obrigado! ✅ O contrato fica registrado nesta conversa.\n\nSegue o boleto com Pix da entrada (50%, {entrada}): [link ou código]. Assim que compensar, começo a montar o site.\n\nPreciso do logo, das fotos e das informações dos serviços, horários e endereço. Pode ir me mandando por aqui." }
+    ]},
     { g:'Entrega e pós-venda', items:[
       { id:'e1', t:'Site no ar', w:'Aproveite para oferecer a manutenção.', x:"O site da {nome} está no ar! 🎉 [link]\n\nVale colocar esse link na bio do Instagram e no perfil do Google. Se quiser, posso cuidar da manutenção por R$ 99,90 por mês, com até 2 alterações incluídas." },
       { id:'e2', t:'Pedir indicação', w:'Uns dias depois da entrega.', x:"Que bom que você gostou! Se conhecer outro negócio que precise de site, pode me indicar? Fico muito grato." }
@@ -726,7 +764,12 @@ dialog textarea{min-height:110px}
   function fillVars(text, l){
     const nome = l ? l.name : '[nome da loja]', nicho = l ? (l.niche || 'o seu negócio') : '[nicho]';
     const link = l && l.trackUrl ? l.trackUrl : '[link da prévia]';
-    return text.replaceAll('{nome}', nome).replaceAll('{nicho}', nicho).replaceAll('{link}', link);
+    const f = getCF(), val = num(f.valor);
+    let out = text.replaceAll('{nome}', nome).replaceAll('{nicho}', nicho).replaceAll('{link}', link)
+      .replaceAll('{valor}', val ? 'R$ '+money(val) : '[valor]').replaceAll('{entrada}', val ? 'R$ '+money(val/2) : '[valor da entrada]')
+      .replaceAll('{prazo}', f.prazo ? String(f.prazo).trim() : '[prazo]');
+    if(out.includes('{contrato}')) out = out.replaceAll('{contrato}', contractPlain());
+    return out;
   }
   function bubbleHtml(text){ return esc(text).replace(/\[[^\]]+\]/g, m => `<mark>${m}</mark>`); }
   function mLead(){ const id = $('#mLead').value; return leads.find(l=>l.id===id) || null; }
@@ -745,7 +788,8 @@ dialog textarea{min-height:110px}
         ? `<textarea data-tid="${it.id}">${esc(raw)}</textarea><div class="row"><button class="btn sm primary" data-ma="save" data-id="${it.id}">Salvar texto</button><button class="btn sm" data-ma="reset" data-id="${it.id}">Voltar ao original</button></div>`
         : `<div class="wa-bg"><div class="bubble">${bubbleHtml(fillVars(raw, l))}</div></div>`;
       const phone = l && String(l.phone||'').replace(/\D/g,'');
-      const waUrl = phone ? 'https://wa.me/'+(phone.length<=11?'55':'')+phone+'?text='+encodeURIComponent(fillVars(raw,l)) : '';
+      const filled = fillVars(raw,l);
+      const waUrl = phone && filled.length < 1800 ? 'https://wa.me/'+(phone.length<=11?'55':'')+phone+'?text='+encodeURIComponent(filled) : '';
       return `<div class="msg"><div><h4>${it.t}${edited?' <span class="tag">editado</span>':''}</h4><div class="when">${it.w}</div></div>${body}
         <div class="row">
           <button class="btn sm primary" data-ma="copy" data-id="${it.id}">Copiar</button>
@@ -852,7 +896,7 @@ dialog textarea{min-height:110px}
       '9.2. Os dois lados mantêm em sigilo as informações não públicas que receberem um do outro por causa deste contrato.',
       '9.3. Qualquer parte pode encerrar o contrato por escrito. Se o Contratante encerrar antes da entrega, paga pelo trabalho já feito, que não passa do valor da entrada, salvo se mais da metade do trabalho já estiver pronta, caso em que o valor é proporcional.',
       '9.4. O Contratado não garante número de visitas, clientes ou vendas gerados pelo site, pois isso depende de fatores fora do seu controle.',
-      '9.5. Este contrato pode ser assinado eletronicamente, por exemplo pelo gov.br, nos termos da Lei nº 14.063/2020. Cada parte declara ter lido e aceitado todas as cláusulas.',
+      '9.5. Este contrato pode ser assinado eletronicamente, por exemplo pelo gov.br, ou aceito por mensagem de WhatsApp enviada pelo Contratante, do número informado na cláusula 1, com a frase “Li e aceito o contrato”, nos termos da Lei nº 14.063/2020. A mensagem, com data e hora, fica registrada como aceite, e as partes a admitem como válida para todos os efeitos. Cada parte declara ter lido e aceitado todas as cláusulas.',
       '9.6. Fica eleito o foro da comarca de Canoas/RS para resolver qualquer dúvida deste contrato.',
       `Canoas/RS, ${hoje}.`]]);
     return { C, m, cliente: v(f.cliente,'NOME DO CLIENTE'), doc: v(f.doc,'CPF/CNPJ') };
@@ -1024,9 +1068,12 @@ dialog textarea{min-height:110px}
     try {
       const v = await api('/api/views'); let marked = 0;
       leads.forEach(l => {
-        const arr = l.trackSlug && v[l.trackSlug]; if(!arr || !arr.length) return;
-        l.views = arr.length; l.lastView = arr[arr.length-1].t;
-        if(['novo','contatado'].includes(l.status||'novo')){ setStatus(l,'visualizou'); marked++; }
+        const arr = l.trackSlug && v[l.trackSlug]; if(!arr) return;
+        const st = l.status||'novo', first = (l.hist||[]).find(h => (RANK[h.s]??0) >= 1);
+        const since = Math.max(first ? first.t : (st==='novo' ? Infinity : 1), l.ignoreBefore||0);
+        const seen = arr.filter(x => x.t >= since);
+        l.views = seen.length; l.lastView = seen.length ? seen[seen.length-1].t : 0;
+        if(seen.length && st==='contatado'){ setStatus(l,'visualizou'); marked++; }
       });
       save(); render();
       if(marked) toast(marked===1 ? '1 loja abriu a prévia 👀' : marked+' lojas abriram a prévia 👀');
@@ -1046,6 +1093,84 @@ dialog textarea{min-height:110px}
       save(); render(); copyText(l.trackUrl, 'Link copiado. Cole na mensagem do WhatsApp');
     } catch(e){ toast('Não consegui criar o link: '+e.message); }
   }
+  // ---------- criar prévia (site de exemplo gerado com os dados da loja) ----------
+  const THEMES = {
+    estetica:{ n:'Estética (ameixa e rosé)', bg:'#2b1b2f', acc:'#f3c9da', soft:'#fbeff4', tx:'#3a2a3f', tag:'Cuidado com a sua pele e o seu bem-estar, em {city}.' },
+    odonto:{ n:'Odontologia (azul petróleo)', bg:'#0f3d4a', acc:'#7fe0d3', soft:'#eaf8f6', tx:'#12323a', tag:'Cuidado com o seu sorriso, em {city}.' },
+    fisio:{ n:'Saúde e movimento (verde)', bg:'#17402e', acc:'#b7e36b', soft:'#f0f7e8', tx:'#1d3326', tag:'Movimento e qualidade de vida, em {city}.' },
+    psico:{ n:'Psicologia (lilás)', bg:'#33295c', acc:'#cdbdff', soft:'#f2eefe', tx:'#2a2347', tag:'Um espaço de acolhimento, em {city}.' },
+    beleza:{ n:'Beleza (dourado)', bg:'#3a2415', acc:'#f1c27d', soft:'#fbf3e8', tx:'#3a2a1e', tag:'Realce o seu estilo, em {city}.' },
+    neutro:{ n:'Neutro (azul)', bg:'#12263f', acc:'#8cc4ff', soft:'#eef5fd', tx:'#17263a', tag:'{niche} em {city}.' }
+  };
+  function themeOf(l){
+    const n = norm((l.niche||'')+' '+(l.name||''));
+    return /estet|pele|laser|depil/.test(n) ? 'estetica' : /odont|dent|sorri/.test(n) ? 'odonto' : /fisio|pilates|quiro/.test(n) ? 'fisio'
+      : /psic|terap/.test(n) ? 'psico' : /beleza|salao|cabel|barbear|unha|manicure/.test(n) ? 'beleza' : 'neutro';
+  }
+  function previewHtml(d){
+    const T = THEMES[d.theme] || THEMES.neutro, name = d.name || 'Sua empresa', city = d.city || '', niche = d.niche || 'negócio local';
+    const tagline = (d.tagline || T.tag).replaceAll('{city}', city || 'sua cidade').replaceAll('{niche}', niche.charAt(0).toUpperCase()+niche.slice(1));
+    let digits = String(d.phone||'').replace(/\D/g,''); if(digits && digits.length<=11) digits = '55'+digits;
+    const wa = digits ? 'https://wa.me/'+digits+'?text='+encodeURIComponent('Olá! Vim pelo site e gostaria de saber mais.') : '';
+    const maps = 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(name+' '+(d.address||city));
+    const ig = instaLink(d.instagram);
+    const services = String(d.services||'').split(/[,;\n]/).map(s=>s.trim()).filter(Boolean).slice(0,12);
+    const rating = String(d.rating||'').trim(), reviews = String(d.reviews||'').trim();
+    const btn = (href, t, cls) => `<a class="b ${cls}" href="${esc(href)}" target="_blank" rel="noopener">${esc(t)}</a>`;
+    return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex, nofollow"><title>${esc(name)} – prévia de proposta</title><style>
+*{box-sizing:border-box;margin:0}body{font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:${T.tx};background:#fff}
+.ban{background:#111;color:#fff;text-align:center;font-size:12px;padding:8px 12px}
+.w{max-width:960px;margin:0 auto}
+.hero{background:${T.bg};color:#fff;padding:60px 22px 68px}
+.kick{color:${T.acc};font-size:14px}
+h1{font:700 clamp(34px,8.5vw,62px)/1.04 Georgia,'Times New Roman',serif;margin:10px 0 16px;max-width:16ch}
+.tag{font-size:18px;max-width:36ch;opacity:.92}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.b{display:inline-block;padding:13px 22px;border-radius:99px;text-decoration:none;font-weight:600}
+.b1{background:${T.acc};color:${T.bg}}.b2{border:1px solid #ffffff66;color:#fff}.b3{background:${T.bg};color:#fff}.b4{border:1px solid ${T.bg};color:${T.bg}}
+.rate{display:inline-block;margin-top:24px;background:#ffffff1a;border:1px solid #ffffff33;border-radius:99px;padding:7px 15px;font-size:14px}
+section{padding:48px 22px}h2{font:700 28px Georgia,'Times New Roman',serif;margin-bottom:18px;color:${T.bg}}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.card{background:${T.soft};border-left:4px solid ${T.bg};border-radius:12px;padding:18px;font-weight:600}
+.band{background:${T.soft}}.big{font:700 64px/1 Georgia,'Times New Roman',serif;color:${T.bg}}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+footer{background:${T.bg};color:#ffffffb3;padding:28px 22px;font-size:13px}
+</style></head><body>
+<div class="ban">Prévia de proposta • exemplo de como o site poderia ficar</div>
+<header class="hero"><div class="w">
+<div class="kick">${esc(niche)}${city?' • '+esc(city):''}</div>
+<h1>${esc(name)}</h1><p class="tag">${esc(tagline)}</p>
+<div class="cta">${wa?btn(wa,'Falar no WhatsApp','b1'):''}${digits?btn('tel:+'+digits,'Ligar','b2'):''}${btn(maps,'Como chegar','b2')}</div>
+${rating?`<div class="rate">★ ${esc(rating)}${reviews?' • '+esc(reviews)+' avaliações no Google':''}</div>`:''}
+</div></header>
+${services.length?`<section><div class="w"><h2>Serviços</h2><div class="cards">${services.map(s=>`<div class="card">${esc(s)}</div>`).join('')}</div></div></section>`:''}
+${rating?`<section class="band"><div class="w"><div class="big">${esc(rating)}</div><p>${reviews?esc(reviews)+' avaliações':'Avaliação'} de clientes no Google</p></div></section>`:''}
+<section><div class="w"><h2>Onde estamos</h2><p>${esc(d.address||city||'')}</p>
+<div class="row">${btn(maps,'Abrir no mapa','b3')}${wa?btn(wa,'Agendar pelo WhatsApp','b4'):''}${ig?btn(ig,'Ver o Instagram','b4'):''}</div></div></section>
+<footer><div class="w">Prévia de proposta criada por Gabriel Machado para ${esc(name)}. É um exemplo de como o site poderia ficar e não é o site oficial.</div></footer>
+</body></html>`;
+  }
+  const rid = n => Array.from(crypto.getRandomValues(new Uint8Array(n)), b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
+  const PF = ['name','niche','tagline','services','city','address','phone','instagram','rating','reviews','theme'];
+  let prevLead = null, prevTimer = 0;
+  const pField = k => $('#dPrev [data-p="'+k+'"]');
+  function prevData(){ const d = {}; PF.forEach(k => { d[k] = pField(k).value.trim(); }); return d; }
+  function prevRender(){ $('#prevFrame').srcdoc = previewHtml(prevData()); }
+  function openPreview(l){
+    prevLead = l;
+    const base = { name:l.name, niche:l.niche||'', tagline:'', services:'', city:l.city||'', address:l.address||'', phone:l.phone||'',
+      instagram:l.instagram||'', rating:l.rating||'', reviews:l.reviews||'', theme:themeOf(l) };
+    const d = { ...base, ...(l.previewData||{}) };
+    PF.forEach(k => { pField(k).value = d[k] ?? ''; });
+    $('#prevTitle').textContent = (l.previewData ? 'Editar prévia: ' : 'Criar prévia: ') + l.name;
+    prevRender(); $('#dPrev').showModal();
+  }
+  function prevPrompt(l, d){
+    return `Crie uma prévia de site personalizada para esta loja, no mesmo nível de acabamento da prévia da Evidency (design próprio, com os serviços reais). Hospede-a e me devolva o endereço para eu colar em "Trocar prévia".\n\n` +
+      `Nome: ${d.name}\nTipo de negócio: ${d.niche}\nCidade: ${d.city}\nEndereço: ${d.address}\nTelefone: ${d.phone || '(não tem)'}\nInstagram: ${d.instagram || '(não tem)'}\nGoogle: nota ${d.rating || '?'} com ${d.reviews || '?'} avaliações\nServiços que sei: ${d.services || '(pesquise no Maps e no Instagram)'}\n\n` +
+      `Use só informações reais (Maps e Instagram), sem inventar serviços, depoimentos ou números.`;
+  }
+
   function renderTrackPanel(){
     const t = getTrack(); $('#tkUrl').value = t.url || ''; $('#tkToken').value = t.token || '';
     const n = leads.filter(l=>l.trackSlug).length, v = leads.filter(l=>l.views).length;
@@ -1081,7 +1206,15 @@ dialog textarea{min-height:110px}
     const b = e.target.closest('[data-act]'); if(!b) return;
     const card = b.closest('.card'); const l = leads.find(x=>x.id===card.dataset.id); if(!l) return;
     const a = b.dataset.act;
-    if(a==='wa'){ if((l.status||'novo')==='novo'){ setStatus(l,'contatado'); save(); setTimeout(render,400); } }
+    if(a==='wa'){ if((l.status||'novo')==='novo'){ setStatus(l,'contatado'); save(); toast('Movida para “Contatado”. Ela sai de “Para contatar”.'); setTimeout(render,400); } }
+    else if(a==='prev'){ openPreview(l); }
+    else if(a==='noview'){
+      if(confirm('Zerar as visualizações desta loja? Use quando a visita foi sua ou de teste.')){
+        l.ignoreBefore = Date.now(); l.views = 0; l.lastView = 0;
+        if((l.status||'')==='visualizou'){ l.hist = (l.hist||[]).filter(h=>h.s!=='visualizou'); l.status = 'contatado'; }
+        save(); render(); toast('Visualizações zeradas. Só visitas novas contam.');
+      }
+    }
     else if(a==='go'){ changeStatus(l, b.dataset.s); }
     else if(a==='sale'){ askSale(l); }
     else if(a==='link'){ l.trackUrl ? copyText(l.trackUrl, 'Link copiado. Cole na mensagem do WhatsApp') : makeLink(l, false); }
@@ -1144,6 +1277,22 @@ dialog textarea{min-height:110px}
     try { await api('/api/ping'); toast('Conectado ✔'); renderTrackPanel(); syncViews(true); }
     catch(e){ toast('Não conectou: '+(e.message==='401'||e.message==='unauthorized'?'senha incorreta':'confira o endereço')); renderTrackPanel(); }
   };
+  $('#count').addEventListener('click', e=>{ if(e.target.closest('[data-all]')){ kpiFilter = ''; renderLeads(); } });
+  pField('theme').innerHTML = Object.entries(THEMES).map(([k,t]) => `<option value="${k}">${t.n}</option>`).join('');
+  $('#dPrev').addEventListener('input', e => { if(e.target.dataset.p){ clearTimeout(prevTimer); prevTimer = setTimeout(prevRender, 250); } });
+  $('#prevAsk').onclick = () => copyText(prevPrompt(prevLead, prevData()), 'Pedido copiado. Cole no chat com o Claude');
+  $('#prevGo').onclick = async () => {
+    const l = prevLead; if(!l) return;
+    if(!trackOn()) return toast('Configure o rastreio no Painel primeiro');
+    if(l.previewUrl && !l.siteSlug && !confirm('Esta loja já tem uma prévia em outro endereço. Substituir pela nova?')) return;
+    const d = prevData(), slug = l.siteSlug || rid(10);
+    try {
+      await api('/api/previews', { method:'POST', body: JSON.stringify({ slug, html: previewHtml(d) }) });
+      l.siteSlug = slug; l.previewData = d; l.previewUrl = getTrack().url.replace(/\/+$/,'') + '/s/' + slug;
+      save(); $('#dPrev').close(); await makeLink(l, false);
+    } catch(e){ toast('Não consegui publicar a prévia: ' + e.message); }
+  };
+  $('#tkMine').onclick = () => trackOn() ? window.open(getTrack().url.replace(/\/+$/,'') + '/eu', '_blank') : toast('Configure o rastreio primeiro');
   $('#tkSync').onclick = ()=> trackOn() ? syncViews(false) : toast('Configure o rastreio primeiro');
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) syncViews(true); });
   $('#bBackup').onclick = ()=>{
